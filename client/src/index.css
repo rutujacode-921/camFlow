@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #FAFAF8;
+    color: #181A1B;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  h1, h2, h3, .font-editorial {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+/* Custom Arch Shape for Creator Hero Portrait (Exact 1:1 match to reference) */
+.arch-portrait {
+  border-top-left-radius: 180px;
+  border-top-right-radius: 180px;
+  border-bottom-left-radius: 180px;
+  border-bottom-right-radius: 180px;
+}
+
+@media (min-width: 768px) {
+  .arch-portrait {
+    border-top-left-radius: 240px;
+    border-top-right-radius: 240px;
+    border-bottom-left-radius: 240px;
+    border-bottom-right-radius: 240px;
+  }
+}
+
+.arch-header {
+  border-top-left-radius: 260px;
+  border-top-right-radius: 260px;
+}
+
+/* Floating animation utilities */
+.floating-element-1 {
+  animation: float 6s ease-in-out infinite;
+}
+
+.floating-element-2 {
+  animation: float 7s ease-in-out 1.5s infinite;
+}
+
+.floating-element-3 {
+  animation: float 5.5s ease-in-out 3s infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+}
+
+/* Rotating Stamp Badge Keyframes */
+@keyframes spinBadge {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rotating-stamp {
+  animation: spinBadge 18s linear infinite;
+}
+
+/* Subtle editorial scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F4F5F0;
+}
+::-webkit-scrollbar-thumb {
+  background: #BDD7BA;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8EBA8A;
+}
