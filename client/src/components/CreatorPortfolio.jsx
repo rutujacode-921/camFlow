@@ -140,9 +140,9 @@ export default function CreatorPortfolio({
           {/* Right Column: Arched Hero Portrait with Rotating Stamp & Motion Pills */}
           <div className="lg:col-span-6 relative flex justify-center lg:justify-end items-center">
             
-            {/* Rotating Stamp (Matching the reference layout placed to the left of the arch) */}
+            {/* Rotating Stamp for Creator Profile */}
             <div className="absolute -left-4 sm:left-4 md:left-8 top-1/3 z-20">
-              <RotatingStamp text="MY PROJECTS • MY PROJECTS • " size={120} />
+              <RotatingStamp text="MY PROFILE • MY PROFILE • " size={120} />
             </div>
 
             {/* Kinetic Floating Pills */}
@@ -405,7 +405,8 @@ export default function CreatorPortfolio({
             </div>
             <div className="flex items-center space-x-4 text-gray-400">
               <span className="hover:text-white cursor-pointer">Instagram</span>
-              <span className="hover:text-white cursor-pointer">LinkedIn</span>
+              <span className="hover:text-white cursor-pointer">YouTube</span>
+              <span className="hover:text-white cursor-pointer">TikTok</span>
               <span className="hover:text-white cursor-pointer">Security Vault</span>
             </div>
           </div>

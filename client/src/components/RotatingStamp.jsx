@@ -1,7 +1,7 @@
 import React from 'react';
 
-export default function RotatingStamp({ text = "MY PROJECTS • MY PROJECTS • ", size = 110 }) {
-  // SVG TextPath rotating badge (Identical to the reference image design!)
+export default function RotatingStamp({ text = "MY PROFILE • MY PROFILE • ", size = 110 }) {
+  // SVG TextPath rotating badge for creator profile
   return (
     <div 
       className="relative flex items-center justify-center select-none" 
@@ -45,3 +45,4 @@ export default function RotatingStamp({ text = "MY PROJECTS • MY PROJECTS • 
     </div>
   );
 }
+

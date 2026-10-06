@@ -37,7 +37,7 @@ export function FloatingEscrowChip() {
     <div className="floating-element-3 absolute top-1/2 -right-12 hidden lg:flex z-20 bg-white/95 backdrop-blur-md border border-amber-200/80 shadow-lg rounded-full py-1.5 px-4 items-center space-x-2">
       <Lock className="w-3.5 h-3.5 text-amber-600" />
       <span className="text-xs font-semibold text-ink-800">Escrow Protected</span>
-      <span className="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">$2,400</span>
+      <span className="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">₹2,00,000</span>
     </div>
   );
 }
@@ -45,7 +45,7 @@ export function FloatingEscrowChip() {
 export function LiveActivityMarquee() {
   const items = [
     "✨ AI Match Algorithm: 94% fit with Eco-Friendly Skincare",
-    "🛡️ Escrow Milestone: $1,000 locked for Draft Review",
+    "🛡️ Escrow Milestone: ₹85,000 locked for Draft Review",
     "🔒 Secure Vault: Dynamic watermarking active for proof review",
     "📊 Fake Follower Scanner: 0.9% bot ratio detected (Organic)",
     "💼 New Proposal: Aura Botanicals invited Nelson Vance",
