@@ -103,7 +103,64 @@ CamFlow bridges this gap through a role-separated dual marketplace:
 
 ---
 
+## 🟢 DAY 2: Dual-Role Authentication, RBAC Core & Multi-Step Onboarding Architecture
+
+### 1. What Was Accomplished in Day 2
+1. **Dual-Role Authentication Engine (`/api/auth`)**:
+   - Implemented JWT-based authentication supporting role differentiation (`brand` vs `creator`).
+   - Secure token generation with payload `{ id, email, role, name, profileId }` and 7-day expiration.
+   - Built Role-Based Access Control (RBAC) middleware:
+     - `requireAuth`: Validates Authorization Bearer tokens.
+     - `requireRole(['brand', 'creator'])`: Enforces endpoint-level permissions.
+   - 1-Click quick login demo seeds for rapid testing:
+     - Creator: `nelson@camflow.io`
+     - Brand: `aura@camflow.io`
+
+2. **Multi-Step Creator Onboarding Wizard (`CreatorOnboardingModal.jsx`)**:
+   - Progressive 4-stage onboarding flow designed with a state machine:
+     - **Stage 1: Identity & Visual Persona** (Full Name, Editorial Discipline, Public Handle, Location, Bio, Profile Image).
+     - **Stage 2: Channel Metrics & Social Verification** (Audience size, Engagement %, Simulated demographic distribution).
+     - **Stage 3: Editorial Category & Niche Taxonomy** (Primary vertical, multi-tag taxonomy chips for AI matching, Featured Case Study title & description).
+     - **Stage 4: Commercial Packages & Escrow Commitment** (Starting package rate, Escrow-Lite milestone terms acceptance).
+   - On completion: Automatically registers the new creator in the system, recalculates directory rankings, and immediately renders their live, personalized **1:1 Editorial Reference Portfolio**.
+
+3. **Brand Campaign Brief Creator & Onboarding (`CreateCampaignModal.jsx`)**:
+   - Brands can post custom campaign briefs (Title, Category, Escrow Budget, Deliverables, Target Demographics, Niche Tags).
+   - Dynamic synchronization: Posting a brief updates the marketplace reference and triggers live AI Match Score recalculation across all creator profiles.
+
+4. **Frontend Auth Context & State Machine (`AuthContext.jsx`)**:
+   - Centralized authentication state with `localStorage` token caching.
+   - Role switcher synchronization between Brand view and Creator view.
+   - Profile management dropdown in the navbar with role badges and account switcher.
+
+---
+
+### 2. Technologies & Design Patterns Used
+- **JSON Web Tokens (`jsonwebtoken`)**: Cryptographically signed stateless bearer tokens preventing server-side session memory overhead.
+- **RBAC (Role-Based Access Control)**: Middleware-driven route protection ensuring brands cannot manipulate creator portfolio stats and creators cannot release brand escrow funds.
+- **React Context API + Custom Hooks (`useAuth`)**: Clean separation of auth state from presentation components, eliminating prop drilling.
+- **Finite State Machine Pattern**: Structured 4-stage wizard ensuring input validation and preventing premature profile publishing.
+- **Tailwind CSS Editorial Design System**: Seamless alignment with the high-fashion light aesthetic (off-white, soft sage, blush accents, and deep charcoal).
+
+---
+
+### 3. Interview Mastery Cheat Sheet: Day 2 Questions & Answers
+
+#### Q1: "Why did you choose stateless JWT authentication over traditional session cookies for CamFlow?"
+> **Answer**: "CamFlow is designed as a scalable dual-sided marketplace. Traditional server-side sessions require stateful memory storage (or centralized Redis instances) to validate session IDs, creating a horizontal scaling bottleneck. By using cryptographically signed JSON Web Tokens (JWTs) with an embedded payload (`id`, `role`, `profileId`), our Express API remains completely stateless. The client stores the token in `localStorage` and presents it via the standard `Authorization: Bearer <token>` header, making horizontal scaling across multiple container instances effortless."
+
+#### Q2: "How does your Role-Based Access Control (RBAC) enforce security between Brands and Creators?"
+> **Answer**: "I created a higher-order Express middleware function `requireRole(allowedRoles)`. When an authenticated request arrives, `requireAuth` first decodes and verifies the JWT signature, attaching `req.user` to the request pipeline. `requireRole` then checks if the user's role exists within the authorized roles array. For instance, creating campaign briefs and releasing escrow payouts strictly requires the `brand` role, while uploading review drafts and editing portfolio showcases requires the `creator` role. Unauthorized attempts return a `403 Forbidden` response."
+
+#### Q3: "How does the Creator Onboarding flow integrate with the AI Match Score algorithm?"
+> **Answer**: "Rather than collecting superficial profile data, the 4-step onboarding wizard acts as an automated feature-engineering pipeline for our AI matching engine. In Step 2 and Step 3, we capture structured categorical verticals, audience age distribution, and niche taxonomy tags (e.g., 'Skincare', 'Clean Beauty', 'Minimalism'). When a creator finishes onboarding, these parameters are indexed so that any brand posting a campaign brief can immediately calculate a multi-dimensional Jaccard similarity and demographic affinity score against that creator."
+
+#### Q4: "How is the user data normalized between Authentication and Profile entities?"
+> **Answer**: "I decoupled the User Auth entity from the Creator Profile entity. The `User` model stores core identity and security fields (`id`, `email`, `passwordHash`, `role`), while the `Creator` model encapsulates portfolio media, social statistics, and verified case studies. The user record holds a foreign key reference `profileId`. This separation of concerns adheres to database normalization principles, ensuring sensitive credentials aren't bundled into public directory responses."
+
+---
+
 ## 🚀 Running the Project Locally
 - **Client (Frontend)**: Runs at `http://localhost:5173` via `npm run dev`
 - **Server (Backend)**: Runs at `http://localhost:5000` via `node src/index.js`
-- **Documentation**: Available in `docs/CAMFLOW_MASTER_NOTES.md` and downloadable directly in the app.
+- **Documentation**: Available in `docs/CAMFLOW_MASTER_NOTES.md`.

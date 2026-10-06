@@ -5,6 +5,7 @@ import campaignRoutes from './routes/campaigns.js';
 import escrowRoutes from './routes/escrow.js';
 import scannerRoutes from './routes/scanner.js';
 import aiRoutes from './routes/ai.js';
+import authRoutes from './routes/auth.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,6 +24,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Mount Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/creators', creatorRoutes);
 app.use('/api/campaigns', campaignRoutes);
 app.use('/api/escrow', escrowRoutes);

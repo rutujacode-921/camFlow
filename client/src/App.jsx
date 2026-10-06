@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import CreatorPortfolio from './components/CreatorPortfolio';
 import BrandDirectory from './components/BrandDirectory';
@@ -7,6 +8,9 @@ import MediaVaultModal from './components/MediaVaultModal';
 import FakeFollowerScannerModal from './components/FakeFollowerScannerModal';
 import AIPitchGeneratorModal from './components/AIPitchGeneratorModal';
 import MatchScoreModal from './components/MatchScoreModal';
+import AuthModal from './components/AuthModal';
+import CreatorOnboardingModal from './components/CreatorOnboardingModal';
+import CreateCampaignModal from './components/CreateCampaignModal';
 import { LiveActivityMarquee } from './components/FloatingElements';
 
 // Initial fallback creators data matching backend
@@ -180,9 +184,9 @@ const initialCampaigns = [
   }
 ];
 
-export default function App() {
+function MainApp() {
+  const { currentRole } = useAuth();
   const [activeView, setActiveView] = useState('portfolio'); // 'portfolio' | 'directory' | 'escrow'
-  const [currentRole, setCurrentRole] = useState('brand'); // 'brand' | 'creator'
   const [creators, setCreators] = useState(initialCreators);
   const [selectedCreator, setSelectedCreator] = useState(initialCreators[0]); // Nelson Vance
   const [campaigns, setCampaigns] = useState(initialCampaigns);
@@ -193,9 +197,12 @@ export default function App() {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isPitchOpen, setIsPitchOpen] = useState(false);
   const [isMediaVaultOpen, setIsMediaVaultOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isCreatorOnboardingOpen, setIsCreatorOnboardingOpen] = useState(false);
+  const [isCreateCampaignOpen, setIsCreateCampaignOpen] = useState(false);
 
-  // Fetch live creators from backend if server is accessible
-  useEffect(() => {
+  // Fetch live creators from backend
+  const fetchCreators = () => {
     fetch('/api/creators')
       .then(res => res.json())
       .then(data => {
@@ -205,9 +212,11 @@ export default function App() {
           if (found) setSelectedCreator(found);
         }
       })
-      .catch(() => {
-        // Fallback initialized
-      });
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchCreators();
   }, []);
 
   const handleSelectCreator = (creator) => {
@@ -216,18 +225,33 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleCreatorCreated = (newCreator) => {
+    setCreators([newCreator, ...creators]);
+    setSelectedCreator(newCreator);
+    setActiveView('portfolio');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCampaignCreated = (newCampaign) => {
+    setCampaigns([newCampaign, ...campaigns]);
+    setSelectedCampaign(newCampaign);
+    setActiveView('directory');
+    fetchCreators();
+  };
+
   return (
     <div className="min-h-screen bg-[#FAFAF8] text-[#181A1B] flex flex-col selection:bg-sage-200">
       
       {/* Dynamic Marquee Header Ticker */}
       <LiveActivityMarquee />
 
-      {/* Main Navbar */}
+      {/* Main Navbar with Auth & Onboarding Triggers */}
       <Navbar 
         activeView={activeView}
         setActiveView={setActiveView}
-        currentRole={currentRole}
-        setCurrentRole={setCurrentRole}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenCreatorOnboarding={() => setIsCreatorOnboardingOpen(true)}
+        onOpenCreateCampaign={() => setIsCreateCampaignOpen(true)}
       />
 
       {/* Main View Router */}
@@ -295,6 +319,34 @@ export default function App() {
         creator={selectedCreator}
       />
 
+      {/* Day 2 Auth & Onboarding Modals */}
+      <AuthModal 
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onOpenCreatorOnboarding={() => setIsCreatorOnboardingOpen(true)}
+        onOpenBrandOnboarding={() => setIsCreateCampaignOpen(true)}
+      />
+
+      <CreatorOnboardingModal 
+        isOpen={isCreatorOnboardingOpen}
+        onClose={() => setIsCreatorOnboardingOpen(false)}
+        onCreatorCreated={handleCreatorCreated}
+      />
+
+      <CreateCampaignModal 
+        isOpen={isCreateCampaignOpen}
+        onClose={() => setIsCreateCampaignOpen(false)}
+        onCampaignCreated={handleCampaignCreated}
+      />
+
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <MainApp />
+    </AuthProvider>
   );
 }

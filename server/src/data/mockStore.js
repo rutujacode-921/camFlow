@@ -251,3 +251,97 @@ export const escrowDeals = [
     ]
   }
 ];
+
+export const users = [
+  {
+    id: "user-nelson",
+    email: "nelson@camflow.io",
+    password: "password123",
+    name: "Nelson Vance",
+    role: "creator",
+    profileId: "creator-nelson",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
+    createdAt: "2026-09-01T00:00:00.000Z"
+  },
+  {
+    id: "user-sophia",
+    email: "sophia@camflow.io",
+    password: "password123",
+    name: "Sophia Chen",
+    role: "creator",
+    profileId: "creator-sophia",
+    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80",
+    createdAt: "2026-09-05T00:00:00.000Z"
+  },
+  {
+    id: "user-aura",
+    email: "aura@camflow.io",
+    password: "password123",
+    name: "Aura Botanicals",
+    role: "brand",
+    companyName: "Aura Botanicals Inc.",
+    profileId: "brand-aura",
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80",
+    createdAt: "2026-08-15T00:00:00.000Z"
+  }
+];
+
+export function addUser(userData) {
+  const newUser = {
+    id: `user-${Date.now()}`,
+    createdAt: new Date().toISOString(),
+    ...userData
+  };
+  users.push(newUser);
+  return newUser;
+}
+
+export function addCreator(creatorData) {
+  const newCreator = {
+    id: `creator-${Date.now()}`,
+    rating: 5.0,
+    completedDeals: 0,
+    socialStats: {
+      instagram: creatorData.audienceSize || "50K",
+      tiktok: "20K",
+      engagementRate: creatorData.engagementRate || "4.5%",
+      avgReach: "25K",
+      authenticityScore: 97,
+      demographics: {
+        topCountries: [{ country: "USA", percent: 45 }, { country: "UK", percent: 25 }, { country: "France", percent: 15 }],
+        ageGroups: [{ group: "18-24", percent: 28 }, { group: "25-34", percent: 54 }, { group: "35-44", percent: 14 }],
+        gender: { female: 65, male: 35 }
+      },
+      audit: {
+        botFollowersEstimate: "1.2%",
+        commentToLikeRatio: "Organic (4.1%)",
+        growthSpikeAnomaly: "Zero flags",
+        trustBadge: "Verified Authentic Tier 1"
+      }
+    },
+    featuredWork: {
+      title: creatorData.featuredTitle || "Signature Visual Series",
+      category: creatorData.category || "Editorial Photography",
+      description: creatorData.featuredDescription || "Curated aesthetic still life and short-form lifestyle integration.",
+      images: creatorData.featuredImages || [
+        "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=600&q=80",
+        "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=600&q=80",
+        "https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&w=600&q=80"
+      ]
+    },
+    testimonial: {
+      quote: "Outstanding artistic vision, meticulous shot composition, and flawless delivery ahead of schedule.",
+      client: "CamFlow Editorial Curation",
+      clientAvatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80"
+    },
+    otherProjects: [
+      { id: `p-${Date.now()}-1`, title: "Botanical Still Life", category: "Commercial", image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=600&q=80" },
+      { id: `p-${Date.now()}-2`, title: "Studio Light Study", category: "Editorial", image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=600&q=80" },
+      { id: `p-${Date.now()}-3`, title: "Minimalist Geometry", category: "Fine Art", image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80" }
+    ],
+    ...creatorData
+  };
+  creators.unshift(newCreator);
+  return newCreator;
+}
+
