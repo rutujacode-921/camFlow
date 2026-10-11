@@ -11,6 +11,9 @@ import MatchScoreModal from './components/MatchScoreModal';
 import AuthModal from './components/AuthModal';
 import CreatorOnboardingModal from './components/CreatorOnboardingModal';
 import CreateCampaignModal from './components/CreateCampaignModal';
+import EditPortfolioModal from './components/EditPortfolioModal';
+import ProjectManagerModal from './components/ProjectManagerModal';
+import SocialSyncModal from './components/SocialSyncModal';
 import { LiveActivityMarquee } from './components/FloatingElements';
 
 // Initial fallback creators data matching backend
@@ -185,7 +188,15 @@ const initialCampaigns = [
 ];
 
 function MainApp() {
-  const { currentRole } = useAuth();
+  const { 
+    currentRole, 
+    updatePortfolio, 
+    addProject, 
+    updateProject, 
+    deleteProject, 
+    syncSocial, 
+    updateTheme 
+  } = useAuth();
   const [activeView, setActiveView] = useState('portfolio'); // 'portfolio' | 'directory' | 'escrow'
   const [creators, setCreators] = useState(initialCreators);
   const [selectedCreator, setSelectedCreator] = useState(initialCreators[0]); // Nelson Vance
@@ -200,6 +211,11 @@ function MainApp() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCreatorOnboardingOpen, setIsCreatorOnboardingOpen] = useState(false);
   const [isCreateCampaignOpen, setIsCreateCampaignOpen] = useState(false);
+
+  // Day 3 Modals state
+  const [isEditPortfolioOpen, setIsEditPortfolioOpen] = useState(false);
+  const [isProjectManagerOpen, setIsProjectManagerOpen] = useState(false);
+  const [isSocialSyncOpen, setIsSocialSyncOpen] = useState(false);
 
   // Fetch live creators from backend
   const fetchCreators = () => {
@@ -239,6 +255,58 @@ function MainApp() {
     fetchCreators();
   };
 
+  // Day 3 Creator Portfolio Actions
+  const handleSavePortfolio = async (updateData) => {
+    const res = await updatePortfolio(selectedCreator.id, updateData);
+    if (res.success) {
+      setSelectedCreator(res.creator);
+      setCreators(prev => prev.map(c => c.id === res.creator.id ? res.creator : c));
+    }
+    return res;
+  };
+
+  const handleAddProject = async (creatorId, projectData) => {
+    const res = await addProject(creatorId, projectData);
+    if (res.success) {
+      setSelectedCreator(res.creator);
+      setCreators(prev => prev.map(c => c.id === res.creator.id ? res.creator : c));
+    }
+    return res;
+  };
+
+  const handleUpdateProject = async (creatorId, projectId, projectData) => {
+    const res = await updateProject(creatorId, projectId, projectData);
+    if (res.success) {
+      setSelectedCreator(res.creator);
+      setCreators(prev => prev.map(c => c.id === res.creator.id ? res.creator : c));
+    }
+    return res;
+  };
+
+  const handleDeleteProject = async (creatorId, projectId) => {
+    const res = await deleteProject(creatorId, projectId);
+    if (res.success) {
+      setSelectedCreator(res.creator);
+      setCreators(prev => prev.map(c => c.id === res.creator.id ? res.creator : c));
+    }
+    return res;
+  };
+
+  const handleSyncSocial = async (creatorId, platformData) => {
+    const res = await syncSocial(creatorId, platformData);
+    if (res.success) {
+      setSelectedCreator(res.creator);
+      setCreators(prev => prev.map(c => c.id === res.creator.id ? res.creator : c));
+    }
+    return res;
+  };
+
+  const handleSelectTheme = async (themeId) => {
+    setSelectedCreator(prev => ({ ...prev, theme: themeId }));
+    setCreators(prev => prev.map(c => c.id === selectedCreator.id ? { ...c, theme: themeId } : c));
+    await updateTheme(selectedCreator.id, themeId);
+  };
+
   return (
     <div className="min-h-screen bg-[#FAFAF8] text-[#181A1B] flex flex-col selection:bg-sage-200">
       
@@ -264,6 +332,11 @@ function MainApp() {
             onOpenScanner={() => setIsScannerOpen(true)}
             onOpenPitchGenerator={() => setIsPitchOpen(true)}
             onOpenMatchScoreModal={() => setIsMatchModalOpen(true)}
+            onOpenEditPortfolio={() => setIsEditPortfolioOpen(true)}
+            onOpenProjectManager={() => setIsProjectManagerOpen(true)}
+            onOpenSocialSync={() => setIsSocialSyncOpen(true)}
+            onSelectTheme={handleSelectTheme}
+            onDeleteProject={handleDeleteProject}
           />
         )}
 
@@ -337,6 +410,30 @@ function MainApp() {
         isOpen={isCreateCampaignOpen}
         onClose={() => setIsCreateCampaignOpen(false)}
         onCampaignCreated={handleCampaignCreated}
+      />
+
+      {/* Day 3 Deep Customization Modals */}
+      <EditPortfolioModal 
+        isOpen={isEditPortfolioOpen}
+        onClose={() => setIsEditPortfolioOpen(false)}
+        creator={selectedCreator}
+        onSave={handleSavePortfolio}
+      />
+
+      <ProjectManagerModal 
+        isOpen={isProjectManagerOpen}
+        onClose={() => setIsProjectManagerOpen(false)}
+        creator={selectedCreator}
+        onAddProject={handleAddProject}
+        onUpdateProject={handleUpdateProject}
+        onDeleteProject={handleDeleteProject}
+      />
+
+      <SocialSyncModal 
+        isOpen={isSocialSyncOpen}
+        onClose={() => setIsSocialSyncOpen(false)}
+        creator={selectedCreator}
+        onSyncSocial={handleSyncSocial}
       />
 
     </div>

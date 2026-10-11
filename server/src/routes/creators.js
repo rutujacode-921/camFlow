@@ -1,5 +1,15 @@
 import express from 'express';
-import { creators, campaigns } from '../data/mockStore.js';
+import { 
+  creators, 
+  campaigns, 
+  updateCreator, 
+  addProjectToCreator, 
+  updateProjectInCreator, 
+  removeProjectFromCreator, 
+  syncCreatorSocial, 
+  updateCreatorTheme 
+} from '../data/mockStore.js';
+import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -98,4 +108,108 @@ router.get('/:id', (req, res) => {
   });
 });
 
+// PUT /api/creators/:id — Update creator portfolio details
+router.put('/:id', requireAuth, (req, res) => {
+  const creatorId = req.params.id;
+  const updatedCreator = updateCreator(creatorId, req.body);
+
+  if (!updatedCreator) {
+    return res.status(404).json({ success: false, message: 'Creator not found' });
+  }
+
+  res.json({
+    success: true,
+    message: 'Creator portfolio updated successfully',
+    creator: updatedCreator
+  });
+});
+
+// POST /api/creators/:id/projects — Add a showcase project
+router.post('/:id/projects', requireAuth, (req, res) => {
+  const creatorId = req.params.id;
+  const result = addProjectToCreator(creatorId, req.body);
+
+  if (!result) {
+    return res.status(404).json({ success: false, message: 'Creator not found' });
+  }
+
+  res.status(201).json({
+    success: true,
+    message: 'New showcase project added to portfolio',
+    project: result.project,
+    creator: result.creator
+  });
+});
+
+// PUT /api/creators/:id/projects/:projectId — Update a showcase project
+router.put('/:id/projects/:projectId', requireAuth, (req, res) => {
+  const { id: creatorId, projectId } = req.params;
+  const result = updateProjectInCreator(creatorId, projectId, req.body);
+
+  if (!result) {
+    return res.status(404).json({ success: false, message: 'Creator or project not found' });
+  }
+
+  res.json({
+    success: true,
+    message: 'Showcase project updated',
+    project: result.project,
+    creator: result.creator
+  });
+});
+
+// DELETE /api/creators/:id/projects/:projectId — Remove a showcase project
+router.delete('/:id/projects/:projectId', requireAuth, (req, res) => {
+  const { id: creatorId, projectId } = req.params;
+  const updatedCreator = removeProjectFromCreator(creatorId, projectId);
+
+  if (!updatedCreator) {
+    return res.status(404).json({ success: false, message: 'Creator not found' });
+  }
+
+  res.json({
+    success: true,
+    message: 'Project removed from portfolio',
+    creator: updatedCreator
+  });
+});
+
+// POST /api/creators/:id/sync-social — Live social handle sync & metrics simulation
+router.post('/:id/sync-social', requireAuth, (req, res) => {
+  const creatorId = req.params.id;
+  const { platform = 'instagram', handle } = req.body;
+  const updatedCreator = syncCreatorSocial(creatorId, { platform, handle });
+
+  if (!updatedCreator) {
+    return res.status(404).json({ success: false, message: 'Creator not found' });
+  }
+
+  res.json({
+    success: true,
+    message: `Successfully synced live metrics from ${platform}`,
+    socialStats: updatedCreator.socialStats,
+    socialLinks: updatedCreator.socialLinks,
+    creator: updatedCreator
+  });
+});
+
+// PATCH /api/creators/:id/theme — Update editorial palette accent
+router.patch('/:id/theme', requireAuth, (req, res) => {
+  const creatorId = req.params.id;
+  const { theme = 'sage' } = req.body;
+  const updatedCreator = updateCreatorTheme(creatorId, theme);
+
+  if (!updatedCreator) {
+    return res.status(404).json({ success: false, message: 'Creator not found' });
+  }
+
+  res.json({
+    success: true,
+    message: `Editorial theme updated to ${theme}`,
+    theme: updatedCreator.theme,
+    creator: updatedCreator
+  });
+});
+
 export default router;
+

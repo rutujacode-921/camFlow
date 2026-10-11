@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import RotatingStamp from './RotatingStamp';
 import { FloatingPill1, FloatingPill2, FloatingEscrowChip } from './FloatingElements';
+import ThemeSelector, { EDITORIAL_THEMES } from './ThemeSelector';
+import { useAuth } from '../context/AuthContext';
 import { 
   ArrowRight, 
   Sparkles, 
@@ -13,7 +15,13 @@ import {
   Mail,
   Instagram,
   Eye,
-  Award
+  Award,
+  Edit3,
+  Plus,
+  RefreshCw,
+  Palette,
+  Sliders,
+  Trash2
 } from 'lucide-react';
 
 export default function CreatorPortfolio({ 
@@ -22,11 +30,26 @@ export default function CreatorPortfolio({
   onOpenMediaVault, 
   onOpenScanner, 
   onOpenPitchGenerator,
-  onOpenMatchScoreModal 
+  onOpenMatchScoreModal,
+  onOpenEditPortfolio,
+  onOpenProjectManager,
+  onOpenSocialSync,
+  onSelectTheme,
+  onDeleteProject
 }) {
+  const { user } = useAuth();
   const [inquiryEmail, setInquiryEmail] = useState('');
   const [inquiryMessage, setInquiryMessage] = useState('');
   const [submittedInquiry, setSubmittedInquiry] = useState(false);
+
+  if (!creator) return null;
+
+  // Determine if viewing as creator owner
+  const isOwner = user?.role === 'creator' && (user?.profileId === creator.id || (!user?.profileId && creator.id === 'creator-nelson'));
+
+  // Active theme aesthetic
+  const currentThemeId = creator.theme || 'sage';
+  const activeTheme = EDITORIAL_THEMES[currentThemeId] || EDITORIAL_THEMES.sage;
 
   const handleInquirySubmit = (e) => {
     e.preventDefault();
@@ -38,8 +61,58 @@ export default function CreatorPortfolio({
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-16">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-12">
       
+      {/* DAY 3: CREATOR STUDIO MANAGEMENT BAR (Visible when viewing own profile) */}
+      {isOwner && (
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-white border-2 border-sage-300 rounded-2xl p-3 px-5 shadow-sm animate-fadeIn">
+          <div className="flex items-center space-x-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-ink-900">
+              ✨ Creator Studio Mode
+            </span>
+            <span className="hidden sm:inline text-xs text-ink-300">|</span>
+            <span className="hidden sm:inline text-xs text-sage-800 font-medium">
+              Live Customization Engine Active
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <ThemeSelector 
+              currentTheme={currentThemeId} 
+              onSelectTheme={onSelectTheme} 
+            />
+
+            <button 
+              onClick={onOpenEditPortfolio}
+              className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-sage-50 hover:bg-sage-100 text-ink-900 px-3 py-1.5 rounded-full border border-sage-200 transition-colors shadow-xs"
+              title="Edit Profile, Bio, Rates & Tags"
+            >
+              <Edit3 className="w-3.5 h-3.5 text-sage-700" />
+              <span>Edit Profile</span>
+            </button>
+
+            <button 
+              onClick={onOpenProjectManager}
+              className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-sage-50 hover:bg-sage-100 text-ink-900 px-3 py-1.5 rounded-full border border-sage-200 transition-colors shadow-xs"
+              title="Add & Manage Showcase Projects"
+            >
+              <Plus className="w-3.5 h-3.5 text-sage-700" />
+              <span>Manage Projects</span>
+            </button>
+
+            <button 
+              onClick={onOpenSocialSync}
+              className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-900 px-3 py-1.5 rounded-full border border-emerald-200 transition-colors shadow-xs"
+              title="Sync Real-Time Metrics & Handles"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Sync Socials</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Top Banner: Killer Feature Quick-Launch Badges */}
       <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-sage-200/80 rounded-2xl p-3 px-5 shadow-sm">
         <div className="flex items-center space-x-2">
@@ -98,14 +171,14 @@ export default function CreatorPortfolio({
         </div>
       </div>
 
-      {/* SECTION 1: HERO SECTION (Exact 1:1 match to reference image) */}
-      <section className="relative pt-6 pb-12">
+      {/* SECTION 1: HERO SECTION (Exact 1:1 match to reference image with Theme accents) */}
+      <section className="relative pt-4 pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Left Column: Heading, Bio, and Call to Action */}
           <div className="lg:col-span-6 space-y-6">
             <div className="inline-flex items-center space-x-2 text-xs font-medium uppercase tracking-widest text-ink-500">
-              <span>{creator.category}</span>
+              <span className={`font-semibold ${activeTheme.accentText}`}>{creator.category}</span>
               <span>•</span>
               <span>{creator.location}</span>
             </div>
@@ -118,7 +191,40 @@ export default function CreatorPortfolio({
               {creator.bio}
             </p>
 
-            <div className="pt-2 flex flex-wrap items-center gap-6">
+            {/* Niche Taxonomy Tags */}
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {(creator.tags || []).map((tag, idx) => (
+                <span 
+                  key={idx} 
+                  className={`text-xs px-2.5 py-1 rounded-full border ${activeTheme.tagBg}`}
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+
+            {/* Starting Rate & Verification Pill */}
+            <div className="flex items-center space-x-4 pt-1 text-xs text-ink-600">
+              <span className="font-semibold text-ink-900">
+                Starting: <span className={activeTheme.accentText}>{creator.startingRate}</span>
+              </span>
+              <span>•</span>
+              <span className="flex items-center space-x-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <span>{creator.completedDeals || 42} Verified Deals</span>
+              </span>
+              <span>•</span>
+              <button
+                onClick={onOpenSocialSync}
+                className="flex items-center space-x-1 hover:text-ink-900 transition-colors cursor-pointer"
+                title="View Live Social Connection"
+              >
+                <Instagram className="w-3.5 h-3.5 text-rose-500" />
+                <span className="underline decoration-dotted">{creator.socialStats?.instagram || '185K'} Reach</span>
+              </button>
+            </div>
+
+            <div className="pt-2 flex flex-wrap items-center gap-4">
               <a 
                 href="#featured" 
                 className="inline-flex items-center space-x-2 text-sm font-semibold text-rose-600 hover:text-rose-700 transition-colors group"
@@ -134,6 +240,16 @@ export default function CreatorPortfolio({
                 <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                 <span>Instant Pitch & Media Kit</span>
               </button>
+
+              {isOwner && (
+                <button
+                  onClick={onOpenEditPortfolio}
+                  className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-white hover:bg-sage-50 text-ink-800 px-3.5 py-2 rounded-full border border-sage-200 transition-colors shadow-xs"
+                >
+                  <Edit3 className="w-3.5 h-3.5 text-sage-700" />
+                  <span>Customize Portfolio</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -166,12 +282,12 @@ export default function CreatorPortfolio({
         </div>
       </section>
 
-      {/* SECTION 2: FEATURED WORK (Soft Pastel Matcha Green Container matching reference) */}
+      {/* SECTION 2: FEATURED WORK (Themed Pastel Container matching reference) */}
       <section id="featured" className="w-full">
-        <div className="bg-[#EBF3EA] rounded-3xl p-8 sm:p-12 lg:p-14 border border-sage-200/80 shadow-sm relative overflow-hidden">
+        <div className={`${activeTheme.cardBg} rounded-3xl p-8 sm:p-12 lg:p-14 border ${activeTheme.borderColor} shadow-sm relative overflow-hidden transition-colors duration-500`}>
           
           {/* Subtle decorative background watermarks */}
-          <div className="absolute top-4 right-8 text-sage-200/40 text-7xl font-editorial select-none pointer-events-none">
+          <div className="absolute top-4 right-8 text-black/5 text-7xl font-editorial select-none pointer-events-none">
             01
           </div>
 
@@ -179,9 +295,20 @@ export default function CreatorPortfolio({
             
             {/* Left Column: Metadata & Description */}
             <div className="lg:col-span-5 space-y-4">
-              <span className="text-xs uppercase tracking-widest font-semibold text-sage-800">
-                {creator.featuredWork?.category || "Product photography"}
-              </span>
+              <div className="flex items-center space-x-2">
+                <span className={`text-xs uppercase tracking-widest font-semibold ${activeTheme.accentText}`}>
+                  {creator.featuredWork?.category || "Product photography"}
+                </span>
+                {isOwner && (
+                  <button 
+                    onClick={onOpenEditPortfolio}
+                    className="p-1 rounded hover:bg-black/5 text-ink-500"
+                    title="Edit Case Study"
+                  >
+                    <Edit3 className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
 
               <h2 className="text-3xl sm:text-4xl font-editorial font-semibold text-ink-900 leading-tight">
                 {creator.featuredWork?.title || "Paris secrets"}
@@ -194,9 +321,9 @@ export default function CreatorPortfolio({
               <div className="pt-2">
                 <button 
                   onClick={() => onOpenMediaVault(creator)}
-                  className="inline-flex items-center space-x-2 text-sm font-semibold text-ink-900 hover:text-sage-900 group"
+                  className="inline-flex items-center space-x-2 text-sm font-semibold text-ink-900 hover:text-black group"
                 >
-                  <span>View project</span>
+                  <span>View project vault</span>
                   <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform" />
                 </button>
               </div>
@@ -233,7 +360,7 @@ export default function CreatorPortfolio({
 
       {/* SECTION 3: TESTIMONIAL PILL (Soft tint with circular client cutout matching reference) */}
       <section className="w-full">
-        <div className="bg-[#F5F8F4] rounded-3xl p-6 sm:p-8 border border-sage-200/60 shadow-sm">
+        <div className={`${activeTheme.testimonialBg} rounded-3xl p-6 sm:p-8 border ${activeTheme.borderColor} shadow-sm transition-colors duration-500`}>
           <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8">
             
             {/* Circular Client Avatar Cutout */}
@@ -252,14 +379,25 @@ export default function CreatorPortfolio({
 
             {/* Testimonial Quote */}
             <div className="flex-1 text-center md:text-left space-y-2">
-              <span className="text-xs uppercase tracking-widest font-semibold text-rose-500">
-                Testimonials
-              </span>
+              <div className="flex items-center justify-center md:justify-start space-x-2">
+                <span className="text-xs uppercase tracking-widest font-semibold text-rose-500">
+                  Testimonials
+                </span>
+                {isOwner && (
+                  <button 
+                    onClick={onOpenEditPortfolio}
+                    className="p-0.5 rounded hover:bg-black/5 text-ink-400"
+                    title="Edit Testimonial"
+                  >
+                    <Edit3 className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
               <p className="text-base sm:text-lg font-editorial italic text-ink-900 leading-snug">
                 "{creator.testimonial?.quote}"
               </p>
               <div className="text-xs font-semibold text-ink-700">
-                <span>Verified Brand Partner</span> • <span className="text-sage-800">{creator.testimonial?.client}</span>
+                <span>Verified Brand Partner</span> • <span className={activeTheme.accentText}>{creator.testimonial?.client}</span>
               </div>
             </div>
 
@@ -267,29 +405,47 @@ export default function CreatorPortfolio({
         </div>
       </section>
 
-      {/* SECTION 4: OTHER PROJECTS (Grid with 3 projects & Explore link matching reference) */}
+      {/* SECTION 4: OTHER PROJECTS (Grid with dynamic project management) */}
       <section className="space-y-6">
         <div className="flex items-center justify-between">
-          <h3 className="text-2xl sm:text-3xl font-editorial font-semibold text-ink-900">
-            Other projects
-          </h3>
-          <button 
-            onClick={() => onOpenMediaVault(creator)}
-            className="inline-flex items-center space-x-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700 transition-colors"
-          >
-            <span>Explore</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-center space-x-3">
+            <h3 className="text-2xl sm:text-3xl font-editorial font-semibold text-ink-900">
+              Other projects
+            </h3>
+            <span className="text-xs text-ink-500">({creator.otherProjects?.length || 0})</span>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            {isOwner && (
+              <button 
+                onClick={onOpenProjectManager}
+                className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-white hover:bg-sage-50 text-ink-900 px-3 py-1.5 rounded-full border border-sage-200 transition-colors shadow-xs"
+              >
+                <Plus className="w-3.5 h-3.5 text-sage-700" />
+                <span>Add / Manage</span>
+              </button>
+            )}
+
+            <button 
+              onClick={() => onOpenMediaVault(creator)}
+              className="inline-flex items-center space-x-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700 transition-colors"
+            >
+              <span>Explore Vault</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {(creator.otherProjects || []).map((project) => (
             <div 
               key={project.id}
-              className="group space-y-3 cursor-pointer"
-              onClick={() => onOpenMediaVault(creator)}
+              className="group space-y-3 relative"
             >
-              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-sage-100 shadow-sm border border-sage-200/60 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-md">
+              <div 
+                className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-sage-100 shadow-sm border border-sage-200/60 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-md cursor-pointer"
+                onClick={() => onOpenMediaVault(creator)}
+              >
                 <img 
                   src={project.image} 
                   alt={project.title}
@@ -298,12 +454,34 @@ export default function CreatorPortfolio({
                 <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] font-semibold text-ink-800 shadow-xs">
                   {project.category}
                 </div>
+
+                {/* Quick Delete action for owner */}
+                {isOwner && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (window.confirm(`Remove "${project.title}" from portfolio?`)) {
+                        onDeleteProject(creator.id, project.id);
+                      }
+                    }}
+                    className="absolute top-3 left-3 p-1.5 rounded-full bg-white/90 text-rose-600 hover:bg-white shadow-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Delete Project"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
+
               <div>
-                <h4 className="text-sm font-semibold text-ink-900 group-hover:text-rose-600 transition-colors">
+                <h4 
+                  onClick={() => onOpenMediaVault(creator)}
+                  className="text-sm font-semibold text-ink-900 group-hover:text-rose-600 transition-colors cursor-pointer"
+                >
                   {project.title}
                 </h4>
-                <p className="text-xs text-ink-500">CamFlow Verified Asset</p>
+                <p className="text-xs text-ink-500">
+                  {project.client ? `Client: ${project.client}` : 'CamFlow Verified Asset'}
+                </p>
               </div>
             </div>
           ))}
@@ -404,10 +582,10 @@ export default function CreatorPortfolio({
               © 2026 CamFlow Inc. • Privacy • Terms • Escrow Rules
             </div>
             <div className="flex items-center space-x-4 text-gray-400">
-              <span className="hover:text-white cursor-pointer">Instagram</span>
-              <span className="hover:text-white cursor-pointer">YouTube</span>
-              <span className="hover:text-white cursor-pointer">TikTok</span>
-              <span className="hover:text-white cursor-pointer">Security Vault</span>
+              <span onClick={onOpenSocialSync} className="hover:text-white cursor-pointer">Instagram</span>
+              <span onClick={onOpenSocialSync} className="hover:text-white cursor-pointer">YouTube</span>
+              <span onClick={onOpenSocialSync} className="hover:text-white cursor-pointer">TikTok</span>
+              <span onClick={() => onOpenMediaVault(creator)} className="hover:text-white cursor-pointer">Security Vault</span>
             </div>
           </div>
 

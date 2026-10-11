@@ -136,6 +136,124 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const updatePortfolio = async (creatorId, updateData) => {
+    try {
+      const res = await fetch(`/api/creators/${creatorId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token || 'demo-token'}`
+        },
+        body: JSON.stringify(updateData)
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Failed to update portfolio');
+      }
+      return { success: true, creator: data.creator };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const addProject = async (creatorId, projectData) => {
+    try {
+      const res = await fetch(`/api/creators/${creatorId}/projects`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token || 'demo-token'}`
+        },
+        body: JSON.stringify(projectData)
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Failed to add project');
+      }
+      return { success: true, project: data.project, creator: data.creator };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const updateProject = async (creatorId, projectId, projectData) => {
+    try {
+      const res = await fetch(`/api/creators/${creatorId}/projects/${projectId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token || 'demo-token'}`
+        },
+        body: JSON.stringify(projectData)
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Failed to update project');
+      }
+      return { success: true, project: data.project, creator: data.creator };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const deleteProject = async (creatorId, projectId) => {
+    try {
+      const res = await fetch(`/api/creators/${creatorId}/projects/${projectId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token || 'demo-token'}`
+        }
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Failed to delete project');
+      }
+      return { success: true, creator: data.creator };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const syncSocial = async (creatorId, platformData) => {
+    try {
+      const res = await fetch(`/api/creators/${creatorId}/sync-social`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token || 'demo-token'}`
+        },
+        body: JSON.stringify(platformData)
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Failed to sync social metrics');
+      }
+      return { success: true, creator: data.creator, socialStats: data.socialStats };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const updateTheme = async (creatorId, theme) => {
+    try {
+      const res = await fetch(`/api/creators/${creatorId}/theme`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token || 'demo-token'}`
+        },
+        body: JSON.stringify({ theme })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Failed to update theme');
+      }
+      return { success: true, creator: data.creator, theme: data.theme };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -147,7 +265,13 @@ export function AuthProvider({ children }) {
       logout,
       quickLoginAs,
       completeCreatorOnboarding,
-      completeBrandOnboarding
+      completeBrandOnboarding,
+      updatePortfolio,
+      addProject,
+      updateProject,
+      deleteProject,
+      syncSocial,
+      updateTheme
     }}>
       {children}
     </AuthContext.Provider>

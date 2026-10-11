@@ -15,6 +15,13 @@ export const creators = [
     rating: 4.96,
     completedDeals: 42,
     startingRate: "$1,800 / project",
+    theme: "sage",
+    socialLinks: {
+      instagram: "nelson.vance",
+      tiktok: "nelson.vance",
+      youtube: "nelsonvance",
+      pinterest: "nelsonvance"
+    },
     tags: ["Photography", "Luxury Fashion", "Product Still Life", "Editorial"],
     socialStats: {
       instagram: "185K",
@@ -68,6 +75,13 @@ export const creators = [
     rating: 4.98,
     completedDeals: 67,
     startingRate: "$2,200 / campaign",
+    theme: "rose",
+    socialLinks: {
+      instagram: "sophiaglows",
+      tiktok: "sophiaglows",
+      youtube: "sophiaglows",
+      pinterest: "sophiaglows"
+    },
     tags: ["Skincare", "Clean Beauty", "Sustainability", "Wellness"],
     socialStats: {
       instagram: "320K",
@@ -121,6 +135,13 @@ export const creators = [
     rating: 4.92,
     completedDeals: 38,
     startingRate: "$1,950 / package",
+    theme: "noir",
+    socialLinks: {
+      instagram: "marcusthorne.tech",
+      tiktok: "marcusthorne.tech",
+      youtube: "marcusthorne",
+      pinterest: "marcusthorne"
+    },
     tags: ["Tech", "Design", "Minimalism", "Desk Setup", "Productivity"],
     socialStats: {
       instagram: "142K",
@@ -339,9 +360,113 @@ export function addCreator(creatorData) {
       { id: `p-${Date.now()}-2`, title: "Studio Light Study", category: "Editorial", image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=600&q=80" },
       { id: `p-${Date.now()}-3`, title: "Minimalist Geometry", category: "Fine Art", image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80" }
     ],
+    theme: creatorData.theme || "sage",
+    socialLinks: creatorData.socialLinks || {
+      instagram: (creatorData.handle || "creator").replace(/^@/, ''),
+      tiktok: (creatorData.handle || "creator").replace(/^@/, '')
+    },
     ...creatorData
   };
   creators.unshift(newCreator);
   return newCreator;
+}
+
+export function updateCreator(id, updateData) {
+  const index = creators.findIndex(c => c.id === id);
+  if (index === -1) return null;
+
+  creators[index] = {
+    ...creators[index],
+    ...updateData,
+    socialStats: {
+      ...creators[index].socialStats,
+      ...(updateData.socialStats || {})
+    },
+    socialLinks: {
+      ...creators[index].socialLinks,
+      ...(updateData.socialLinks || {})
+    },
+    featuredWork: {
+      ...creators[index].featuredWork,
+      ...(updateData.featuredWork || {})
+    },
+    testimonial: {
+      ...creators[index].testimonial,
+      ...(updateData.testimonial || {})
+    }
+  };
+  return creators[index];
+}
+
+export function addProjectToCreator(id, projectData) {
+  const creator = creators.find(c => c.id === id);
+  if (!creator) return null;
+  if (!creator.otherProjects) creator.otherProjects = [];
+
+  const newProject = {
+    id: `p-${Date.now()}`,
+    title: projectData.title || "Curated Editorial Shoot",
+    category: projectData.category || "Commercial",
+    image: projectData.image || "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=600&q=80",
+    client: projectData.client || "CamFlow Partner",
+    year: projectData.year || new Date().getFullYear().toString(),
+    deliverables: projectData.deliverables || "Photos + Short Video",
+    createdAt: new Date().toISOString()
+  };
+
+  creator.otherProjects.unshift(newProject);
+  return { creator, project: newProject };
+}
+
+export function updateProjectInCreator(id, projectId, projectData) {
+  const creator = creators.find(c => c.id === id);
+  if (!creator || !creator.otherProjects) return null;
+  const pIndex = creator.otherProjects.findIndex(p => p.id === projectId);
+  if (pIndex === -1) return null;
+
+  creator.otherProjects[pIndex] = {
+    ...creator.otherProjects[pIndex],
+    ...projectData
+  };
+  return { creator, project: creator.otherProjects[pIndex] };
+}
+
+export function removeProjectFromCreator(id, projectId) {
+  const creator = creators.find(c => c.id === id);
+  if (!creator || !creator.otherProjects) return null;
+  creator.otherProjects = creator.otherProjects.filter(p => p.id !== projectId);
+  return creator;
+}
+
+export function syncCreatorSocial(id, { platform, handle }) {
+  const creator = creators.find(c => c.id === id);
+  if (!creator) return null;
+
+  if (!creator.socialLinks) creator.socialLinks = {};
+  if (platform && handle) {
+    creator.socialLinks[platform] = handle.replace(/^@/, '');
+  }
+
+  // Simulate real-time API sync with Instagram Graph API / TikTok API
+  if (creator.socialStats) {
+    // Generate realistic synced variance
+    const igK = parseInt(creator.socialStats.instagram || "180", 10) + (Math.floor(Math.random() * 5) - 1);
+    const tkK = parseInt(creator.socialStats.tiktok || "90", 10) + (Math.floor(Math.random() * 4) - 1);
+    creator.socialStats.instagram = `${igK}K`;
+    creator.socialStats.tiktok = `${tkK}K`;
+    creator.socialStats.lastSyncedAt = new Date().toISOString();
+    creator.socialStats.syncStatus = 'verified';
+    if (!creator.socialStats.audit) creator.socialStats.audit = {};
+    creator.socialStats.audit.trustBadge = "Verified Authentic Tier 1 (Live Synced)";
+  }
+
+  return creator;
+}
+
+export function updateCreatorTheme(id, theme) {
+  const creator = creators.find(c => c.id === id);
+  if (!creator) return null;
+  creator.theme = theme;
+  return creator;
 }
 
