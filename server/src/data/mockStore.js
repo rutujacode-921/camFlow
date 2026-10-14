@@ -14,7 +14,7 @@ export const creators = [
     category: "Product & Editorial Photography",
     rating: 4.96,
     completedDeals: 42,
-    startingRate: "$1,800 / project",
+    startingRate: "₹1,50,000 / project",
     theme: "sage",
     socialLinks: {
       instagram: "nelson.vance",
@@ -74,7 +74,7 @@ export const creators = [
     category: "Eco-Friendly Skincare & Beauty",
     rating: 4.98,
     completedDeals: 67,
-    startingRate: "$2,200 / campaign",
+    startingRate: "₹1,80,000 / campaign",
     theme: "rose",
     socialLinks: {
       instagram: "sophiaglows",
@@ -134,7 +134,7 @@ export const creators = [
     category: "Tech & Workspace Design",
     rating: 4.92,
     completedDeals: 38,
-    startingRate: "$1,950 / package",
+    startingRate: "₹1,60,000 / package",
     theme: "noir",
     socialLinks: {
       instagram: "marcusthorne.tech",
@@ -191,8 +191,8 @@ export const campaigns = [
     brandLogo: "🌿",
     title: "Eco-Friendly Skincare Summer Launch",
     productCategory: "Skincare",
-    budget: "$4,500",
-    budgetNumeric: 4500,
+    budget: "₹3,75,000",
+    budgetNumeric: 375000,
     tags: ["Skincare", "Clean Beauty", "Sustainability", "Editorial"],
     targetDemographics: {
       targetAge: "25-34",
@@ -209,8 +209,8 @@ export const campaigns = [
     brandLogo: "⚡",
     title: "Minimalist Magnetic Charger Showcase",
     productCategory: "Tech & Workspace Design",
-    budget: "$3,200",
-    budgetNumeric: 3200,
+    budget: "₹2,65,000",
+    budgetNumeric: 265000,
     tags: ["Tech", "Design", "Productivity", "Photography"],
     targetDemographics: {
       targetAge: "25-34",
@@ -231,24 +231,24 @@ export const escrowDeals = [
     brandName: "Aura Botanicals",
     creatorId: "creator-nelson",
     creatorName: "Nelson Vance",
-    totalAmount: 2400,
+    totalAmount: 200000,
     escrowStatus: "LOCKED_IN_ESCROW", // PENDING_DEPOSIT, LOCKED_IN_ESCROW, COMPLETED
     milestones: [
       {
         id: "m1",
         title: "Concept Moodboard & Shot List",
-        amount: 600,
+        amount: 50000,
         status: "COMPLETED", // PENDING, SUBMITTED, COMPLETED
         submissionDate: "2026-10-01",
         completedDate: "2026-10-02",
         proofAssetUrl: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=600&q=80",
         isWatermarked: false,
-        notes: "Approved by Brand Director. $600 released to creator wallet."
+        notes: "Approved by Brand Director. ₹50,000 released to creator wallet."
       },
       {
         id: "m2",
         title: "Draft Watermarked Content & Reel Upload",
-        amount: 1000,
+        amount: 85000,
         status: "SUBMITTED",
         submissionDate: "2026-10-03",
         completedDate: null,
@@ -261,7 +261,7 @@ export const escrowDeals = [
       {
         id: "m3",
         title: "Live Posting & Verified Analytics Report",
-        amount: 800,
+        amount: 65000,
         status: "PENDING",
         submissionDate: null,
         completedDate: null,

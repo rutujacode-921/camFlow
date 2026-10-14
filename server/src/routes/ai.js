@@ -76,9 +76,9 @@ router.post('/media-kit', (req, res) => {
     ],
     audienceBreakdown: creator.socialStats?.demographics || {},
     packages: [
-      { name: "Single Editorial Flatlay", price: "$850", turnaround: "3 Business Days" },
-      { name: "Cinematic Reel + 3 High-Res Photos", price: "$1,800", turnaround: "7 Business Days" },
-      { name: "Full Omni-Channel Campaign Suite", price: "$3,400", turnaround: "14 Business Days" }
+      { name: "Single Editorial Flatlay", price: "₹70,000", turnaround: "3 Business Days" },
+      { name: "Cinematic Reel + 3 High-Res Photos", price: "₹1,50,000", turnaround: "7 Business Days" },
+      { name: "Full Omni-Channel Campaign Suite", price: "₹2,80,000", turnaround: "14 Business Days" }
     ],
     generatedStamp: `Verified by CamFlow Engine • ${new Date().toLocaleDateString()}`
   };

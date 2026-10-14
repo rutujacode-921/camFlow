@@ -24,8 +24,8 @@ router.post('/', (req, res) => {
     brandLogo: '✨',
     title: title || 'New Campaign Brief',
     productCategory: productCategory || 'General',
-    budget: budget || '$2,500',
-    budgetNumeric: parseInt(budget?.replace(/[^0-9]/g, '') || '2500', 10),
+    budget: budget || '₹2,50,000',
+    budgetNumeric: parseInt(budget?.replace(/[^0-9]/g, '') || '250000', 10),
     tags: tags ? (Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim())) : ['Creator', 'Marketing'],
     targetDemographics: {
       targetAge: targetAge || '25-34',

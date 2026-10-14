@@ -33,7 +33,7 @@ router.post('/:dealId/milestones/:milestoneId/approve', (req, res) => {
   milestone.status = 'COMPLETED';
   milestone.completedDate = new Date().toISOString().split('T')[0];
   milestone.isWatermarked = false; // Raw unwatermarked asset unlocked!
-  milestone.notes = `Approved by brand. $${milestone.amount} successfully transferred to creator wallet.`;
+  milestone.notes = `Approved by brand. ₹${milestone.amount.toLocaleString('en-IN')} successfully transferred to creator wallet.`;
 
   // Check if all milestones are completed
   const allDone = deal.milestones.every(m => m.status === 'COMPLETED');
@@ -43,7 +43,7 @@ router.post('/:dealId/milestones/:milestoneId/approve', (req, res) => {
 
   res.json({
     success: true,
-    message: `Milestone "${milestone.title}" approved! $${milestone.amount} released from escrow.`,
+    message: `Milestone "${milestone.title}" approved! ₹${milestone.amount.toLocaleString('en-IN')} released from escrow.`,
     milestone,
     deal
   });
