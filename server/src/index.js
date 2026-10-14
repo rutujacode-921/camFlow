@@ -6,6 +6,7 @@ import escrowRoutes from './routes/escrow.js';
 import scannerRoutes from './routes/scanner.js';
 import aiRoutes from './routes/ai.js';
 import authRoutes from './routes/auth.js';
+import proposalRoutes from './routes/proposals.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -30,6 +31,7 @@ app.use('/api/campaigns', campaignRoutes);
 app.use('/api/escrow', escrowRoutes);
 app.use('/api/scanner', scannerRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/proposals', proposalRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

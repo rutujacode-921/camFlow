@@ -470,3 +470,104 @@ export function updateCreatorTheme(id, theme) {
   return creator;
 }
 
+// ─── DAY 5: PROPOSALS & CONTRACT PIPELINE ────────────────────────────────────
+
+export const proposals = [
+  {
+    id: "prop-101",
+    campaignId: "camp-001",
+    campaignTitle: "Eco-Friendly Skincare Summer Launch",
+    creatorId: "creator-nelson",
+    creatorName: "Nelson Vance",
+    creatorHandle: "@nelson.vance",
+    creatorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
+    brandName: "Aura Botanicals",
+    pitchMessage: "I specialize in clean editorial aesthetics that resonate with conscious beauty consumers. My audience has a 56% concentration in your exact target demographic (25-34) and a 4.8% engagement rate.",
+    proposedRate: "₹1,50,000",
+    deliverablesOffered: "1x High-Res Editorial Flatlay + 2x Cinematic IG Reels",
+    estimatedDays: 14,
+    status: "SHORTLISTED", // PENDING, UNDER_REVIEW, SHORTLISTED, ACCEPTED, REJECTED, CONTRACT_GENERATED
+    submittedAt: "2026-10-10T10:30:00.000Z",
+    contract: null
+  },
+  {
+    id: "prop-102",
+    campaignId: "camp-001",
+    campaignTitle: "Eco-Friendly Skincare Summer Launch",
+    creatorId: "creator-sophia",
+    creatorName: "Sophia Chen",
+    creatorHandle: "@sophiaglows",
+    creatorAvatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80",
+    brandName: "Aura Botanicals",
+    pitchMessage: "As a certified holistic esthetician with 99% authentic engagement, my community actively trusts my clean beauty recommendations. My last campaign drove 34% conversions.",
+    proposedRate: "₹1,80,000",
+    deliverablesOffered: "3x 4K Morning Routine Stories + 1x Dedicated Tutorial Reel",
+    estimatedDays: 10,
+    status: "CONTRACT_GENERATED",
+    submittedAt: "2026-10-11T14:15:00.000Z",
+    contract: {
+      contractNumber: "CAMFLOW-CTR-2026-0042",
+      effectiveDate: "2026-10-12",
+      brandSignee: "Aura Botanicals Legal",
+      creatorSignee: "Sophia Chen",
+      totalEscrowSum: "₹1,80,000",
+      milestonesCount: 3,
+      rightsTerm: "12 Months Digital Worldwide Exclusivity"
+    }
+  },
+  {
+    id: "prop-103",
+    campaignId: "camp-002",
+    campaignTitle: "Minimalist Magnetic Charger Showcase",
+    creatorId: "creator-marcus",
+    creatorName: "Marcus Thorne",
+    creatorHandle: "@marcusthorne.tech",
+    creatorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80",
+    brandName: "Lumina Tech",
+    pitchMessage: "Our desk setup aesthetic matches Lumina's minimalist industrial design. We will craft a high-production tactile unboxing reel featuring macro product details.",
+    proposedRate: "₹1,60,000",
+    deliverablesOffered: "1x Desk Setup Feature Video + 3x Static Carousel Posts",
+    estimatedDays: 12,
+    status: "UNDER_REVIEW",
+    submittedAt: "2026-10-12T09:00:00.000Z",
+    contract: null
+  }
+];
+
+export function addProposal(proposalData) {
+  const newProp = {
+    id: `prop-${Date.now().toString().slice(-4)}`,
+    status: 'PENDING',
+    submittedAt: new Date().toISOString(),
+    contract: null,
+    ...proposalData
+  };
+  proposals.unshift(newProp);
+  return newProp;
+}
+
+export function updateProposalStatus(id, status, notes = '') {
+  const index = proposals.findIndex(p => p.id === id);
+  if (index === -1) return null;
+
+  proposals[index].status = status;
+  proposals[index].updatedAt = new Date().toISOString();
+  if (notes) proposals[index].reviewNotes = notes;
+
+  // Auto-generate contract when moved to CONTRACT_GENERATED or ACCEPTED
+  if (status === 'CONTRACT_GENERATED' && !proposals[index].contract) {
+    proposals[index].contract = {
+      contractNumber: `CAMFLOW-CTR-${Date.now().toString().slice(-6)}`,
+      effectiveDate: new Date().toISOString().split('T')[0],
+      brandSignee: `${proposals[index].brandName} Director`,
+      creatorSignee: proposals[index].creatorName,
+      totalEscrowSum: proposals[index].proposedRate,
+      milestonesCount: 3,
+      rightsTerm: '12 Months Digital Exclusivity'
+    };
+  }
+
+  return proposals[index];
+}
+
+
