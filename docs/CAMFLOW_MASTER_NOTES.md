@@ -190,3 +190,77 @@ CamFlow bridges this gap through a role-separated dual marketplace:
 - **Full-Stack Concurrent**: `npm run dev` from the repository root.
 - **Documentation**: Available in `docs/CAMFLOW_MASTER_NOTES.md`.
 
+
+
+---
+
+## 📅 Day 4: Brand Discovery & AI Match Algorithm Enhancement
+
+### Overview
+Day 4 transforms the Brand Directory from a static filtered list into a **live scoring engine** with editorial-quality UX, real-time campaign context switching, and a fully transparent AI Match Score modal.
+
+---
+
+### New Files (Day 4)
+| File | Purpose |
+|------|---------|
+| `client/src/components/MatchFilterPanel.jsx` | Smart sidebar filter panel with budget sliders, tag chips, score/authenticity/engagement range controls, sort selector |
+
+### Modified Files (Day 4)
+| File | Changes |
+|------|---------|
+| `client/src/components/BrandDirectory.jsx` | Full rewrite — sidebar layout, grid/list toggle, embedded MatchScoreBar per card, full client-side multi-filter pipeline |
+| `client/src/components/MatchScoreModal.jsx` | Dynamic pillar breakdown live-computed from creator+campaign data, SVG score ring gauge, 4 color-coded progress bars |
+| `server/src/routes/creators.js` | Match scoring v2 (Jaccard tag similarity, partial category, gender affinity), multi-filter GET params, new `/leaderboard` endpoint |
+| `client/src/App.jsx` | fetchCreators passes campaignId; useEffect deps on selectedCampaign.id for live rescoring |
+
+---
+
+### Algorithm Architecture: Match Score v2
+
+```
+Total Score = min(Base + Pillar Sum, 99)
+
+Base:  50 pts
+
+Pillar 1 — Niche & Tag Overlap          (max 25 pts)
+  Jaccard(creator.tags, campaign.tags) × 25
+  Jaccard = |intersection| / |union|
+
+Pillar 2 — Category & Aesthetic Alignment (max 15 pts)
+  15: Direct substring match
+   7: Partial word overlap (>3 chars)
+   0: No alignment
+
+Pillar 3 — Audience Demographic Match   (max 10 pts)
+  8: Target age group >= 40% of audience
+  4: Target age group >= 25%
+  +2 bonus: Gender affinity (female >= 60% or male >= 60%)
+
+Pillar 4 — Authenticity Trust Bonus     (max 5 pts)
+  5: authenticityScore >= 95%
+  3: authenticityScore >= minAuthenticity
+  0: Below threshold
+
+Cap: 99% — no creator is a perfect match
+```
+
+---
+
+### Interview Q&A — Day 4
+
+**Q: What similarity algorithm does CamFlow use?**
+Jaccard Index — ideal for discrete tag sets. Unlike cosine similarity which requires vector magnitude, Jaccard measures |intersection|/|union| — rewards precision not volume.
+
+**Q: Why Jaccard over cosine similarity?**
+Cosine works for high-dimensional TF-IDF document vectors. For discrete sets of 5–10 tags, Jaccard is more interpretable and correctly scaled.
+
+**Q: How do filters combine client vs server?**
+BrandDirectory uses `useMemo` for all client-side filtering on pre-fetched data. The API also accepts query params for server-side filtering — dual approach means the API is pagination-ready for future scale.
+
+**Q: Why cap the score at 99%?**
+Design decision — no creator is a "perfect" match. Prevents 100% becoming meaningless. Keeps brands using human judgment alongside algorithmic scores.
+
+**Q: How does campaign context switching work?**
+`setSelectedCampaign` updates App state → `useEffect` with `selectedCampaign.id` dependency triggers `fetchCreators(campaignId)` → backend recalculates all scores against new campaign tags, budget, demographics → freshly scored creators returned.
+

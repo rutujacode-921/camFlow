@@ -217,9 +217,10 @@ function MainApp() {
   const [isProjectManagerOpen, setIsProjectManagerOpen] = useState(false);
   const [isSocialSyncOpen, setIsSocialSyncOpen] = useState(false);
 
-  // Fetch live creators from backend
-  const fetchCreators = () => {
-    fetch('/api/creators')
+  // Fetch live creators from backend — pass campaignId so scores recalculate dynamically
+  const fetchCreators = (campaignId) => {
+    const qp = campaignId ? `?campaignId=${campaignId}` : '';
+    fetch(`/api/creators${qp}`)
       .then(res => res.json())
       .then(data => {
         if (data.success && data.creators?.length) {
@@ -232,8 +233,8 @@ function MainApp() {
   };
 
   useEffect(() => {
-    fetchCreators();
-  }, []);
+    fetchCreators(selectedCampaign?.id);
+  }, [selectedCampaign?.id]);
 
   const handleSelectCreator = (creator) => {
     setSelectedCreator(creator);
@@ -252,7 +253,7 @@ function MainApp() {
     setCampaigns([newCampaign, ...campaigns]);
     setSelectedCampaign(newCampaign);
     setActiveView('directory');
-    fetchCreators();
+    fetchCreators(newCampaign.id);
   };
 
   // Day 3 Creator Portfolio Actions
