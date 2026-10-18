@@ -35,7 +35,8 @@ export default function CreatorPortfolio({
   onOpenProjectManager,
   onOpenSocialSync,
   onSelectTheme,
-  onDeleteProject
+  onDeleteProject,
+  onOpenSubmitProposal
 }) {
   const { user } = useAuth();
   const [inquiryEmail, setInquiryEmail] = useState('');
@@ -239,6 +240,14 @@ export default function CreatorPortfolio({
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                 <span>Instant Pitch & Media Kit</span>
+              </button>
+
+              <button
+                onClick={() => onOpenSubmitProposal && onOpenSubmitProposal()}
+                className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-sage-800 hover:bg-sage-900 text-white px-4 py-2.5 rounded-full shadow-md transition-transform hover:-translate-y-0.5"
+              >
+                <FileText className="w-3.5 h-3.5" />
+                <span>Submit Collaboration Proposal</span>
               </button>
 
               {isOwner && (

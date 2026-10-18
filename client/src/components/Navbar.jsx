@@ -41,7 +41,7 @@ export default function Navbar({
           </div>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center space-x-8 text-sm font-medium">
+          <nav className="hidden md:flex items-center space-x-7 text-sm font-medium">
             <button 
               onClick={() => setActiveView('portfolio')}
               className={`transition-colors py-1 ${activeView === 'portfolio' ? 'text-ink-900 font-semibold border-b-2 border-sage-800' : 'text-ink-500 hover:text-ink-900'}`}
@@ -53,6 +53,12 @@ export default function Navbar({
               className={`transition-colors py-1 ${activeView === 'directory' ? 'text-ink-900 font-semibold border-b-2 border-sage-800' : 'text-ink-500 hover:text-ink-900'}`}
             >
               Brand Discovery & AI Match
+            </button>
+            <button 
+              onClick={() => setActiveView('proposals')}
+              className={`transition-colors py-1 ${activeView === 'proposals' ? 'text-ink-900 font-semibold border-b-2 border-sage-800' : 'text-ink-500 hover:text-ink-900'}`}
+            >
+              Proposals & Pipeline
             </button>
             <button 
               onClick={() => setActiveView('escrow')}

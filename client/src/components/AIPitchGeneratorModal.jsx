@@ -9,7 +9,8 @@ import {
   Send, 
   TrendingUp, 
   ShieldCheck, 
-  ArrowRight 
+  ArrowRight,
+  Briefcase
 } from 'lucide-react';
 
 export default function AIPitchGeneratorModal({ isOpen, onClose, creator }) {
@@ -32,7 +33,7 @@ For this collaboration, I envision:
 1. High-fidelity editorial imagery highlighting your product's signature texture and glass packaging.
 2. A cinematic short-form Reel documenting an organic routine integration with trackable links.
 
-I work exclusively through CamFlow's Escrow-Lite pipeline to guarantee verified milestones, watermarked draft review, and timely release.
+I work exclusively through CamFlow's Escrow-Lite pipeline to guarantee verified milestones, watermarked draft review, and timely release in Indian Rupee (₹).
 
 Would you be open to reviewing a custom moodboard this Thursday?
 
@@ -64,260 +65,231 @@ ${creator?.name || 'Nelson Vance'}`
           body: data.pitch
         });
       }
-    } catch (err) {
-      // Fallback
-    } finally {
       setIsGenerating(false);
+    } catch {
+      // Fallback
+      setTimeout(() => {
+        setGeneratedPitch({
+          subject: `Collaboration Pitch: ${creator?.name} × ${brandName}`,
+          body: `Hi ${brandName} Team,\n\nI would love to partner on your upcoming campaign. With a verified authentic community and high engagement in your niche, we can drive genuine brand lift.\n\nBest,\n${creator?.name}`
+        });
+        setIsGenerating(false);
+      }, 500);
     }
   };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(`${generatedPitch.subject}\n\n${generatedPitch.body}`);
     setCopied(true);
-    setTimeout(() => setCopied(false), 3000);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownloadMediaKit = () => {
+    alert(`📄 Dynamic Digital Media Kit downloaded for ${creator?.name}! Format: PDF (CamFlow Certified)`);
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-3xl w-full border border-sage-200 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="bg-white rounded-3xl max-w-2xl w-full border border-sage-200 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         
         {/* Modal Header */}
         <div className="p-6 border-b border-sage-200 flex items-center justify-between bg-[#F8FAF7]">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-2xl bg-rose-100 flex items-center justify-center text-rose-600">
+            <div className="w-10 h-10 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-800">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-xs uppercase tracking-wider font-semibold text-rose-700">
-                  Killer Feature 5
+                <span className="text-xs uppercase tracking-wider font-semibold text-amber-800">
+                  AI Creator Suite
                 </span>
-                <span className="text-xs bg-rose-100 text-rose-900 px-2 py-0.5 rounded-full font-bold">
-                  AI Conversion Assistant
+                <span className="text-xs bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full font-bold">
+                  Pitch & Media Kit
                 </span>
               </div>
               <h3 className="text-xl font-editorial font-semibold text-ink-900">
-                AI Pitch & Dynamic Media Kit Generator
+                AI Pitch & Digital Media Kit Generator
               </h3>
             </div>
           </div>
 
           <button 
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-white border border-sage-200 flex items-center justify-center text-ink-500 hover:text-ink-900 hover:bg-sage-50 transition"
+            className="w-9 h-9 rounded-full bg-white border border-sage-200 flex items-center justify-center text-ink-500 hover:text-ink-900 transition"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex border-b border-sage-200 bg-[#FAFBF9] px-6 pt-3 gap-6 text-xs font-semibold">
-          <button 
+        <div className="flex border-b border-sage-200 bg-[#FAFBF9] px-6 pt-3">
+          <button
             onClick={() => setActiveTab('pitch')}
-            className={`pb-3 border-b-2 transition flex items-center space-x-1.5 ${
+            className={`pb-3 px-4 text-xs font-semibold border-b-2 transition ${
               activeTab === 'pitch' 
-                ? 'border-rose-600 text-rose-700' 
-                : 'border-transparent text-ink-500 hover:text-ink-800'
+                ? 'border-sage-800 text-ink-900' 
+                : 'border-transparent text-ink-400 hover:text-ink-700'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>AI Pitch Crafter</span>
+            AI Custom Pitch Draft
           </button>
-          
-          <button 
+          <button
             onClick={() => setActiveTab('mediakit')}
-            className={`pb-3 border-b-2 transition flex items-center space-x-1.5 ${
+            className={`pb-3 px-4 text-xs font-semibold border-b-2 transition ${
               activeTab === 'mediakit' 
-                ? 'border-rose-600 text-rose-700' 
-                : 'border-transparent text-ink-500 hover:text-ink-800'
+                ? 'border-sage-800 text-ink-900' 
+                : 'border-transparent text-ink-400 hover:text-ink-700'
             }`}
           >
-            <FileText className="w-3.5 h-3.5" />
-            <span>Digital Media Kit Preview</span>
+            Live Digital Media Kit
           </button>
         </div>
 
-        {/* Tab Content */}
+        {/* Modal Body */}
         <div className="p-6 overflow-y-auto space-y-6">
           
           {activeTab === 'pitch' ? (
-            <div className="space-y-6">
-              
-              {/* Form */}
-              <form onSubmit={handleGenerate} className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#F5F8F4] p-4 rounded-2xl border border-sage-200">
+            <div className="space-y-5">
+              {/* Pitch Generation Form */}
+              <form onSubmit={handleGenerate} className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#FAFBF9] p-4 rounded-2xl border border-sage-200">
                 <div>
-                  <label className="block text-[11px] uppercase tracking-wider font-semibold text-ink-600 mb-1">
-                    Target Brand Name
-                  </label>
-                  <input 
-                    type="text" 
+                  <label className="block text-[10px] uppercase font-bold text-ink-600 mb-1">Target Brand</label>
+                  <input
+                    type="text"
                     value={brandName}
                     onChange={(e) => setBrandName(e.target.value)}
-                    className="w-full bg-white border border-sage-200 rounded-xl px-3 py-2 text-xs text-ink-900 focus:outline-none focus:ring-1 focus:ring-rose-400 font-medium"
-                    placeholder="e.g. Glossier, Aura Botanicals"
+                    className="w-full bg-white border border-sage-200 rounded-xl px-3 py-2 text-xs text-ink-900 font-semibold focus:outline-none"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-[11px] uppercase tracking-wider font-semibold text-ink-600 mb-1">
-                    Campaign Goal / Product
-                  </label>
-                  <input 
-                    type="text" 
+                  <label className="block text-[10px] uppercase font-bold text-ink-600 mb-1">Campaign Focus</label>
+                  <input
+                    type="text"
                     value={campaignGoal}
                     onChange={(e) => setCampaignGoal(e.target.value)}
-                    className="w-full bg-white border border-sage-200 rounded-xl px-3 py-2 text-xs text-ink-900 focus:outline-none focus:ring-1 focus:ring-rose-400 font-medium"
-                    placeholder="e.g. Eco-Friendly Skincare Launch"
+                    className="w-full bg-white border border-sage-200 rounded-xl px-3 py-2 text-xs text-ink-900 font-semibold focus:outline-none"
                   />
                 </div>
-
-                <div className="sm:col-span-2 flex items-center justify-between pt-1">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xs text-ink-600 font-medium">Tone:</span>
+                <div className="sm:col-span-2 flex justify-between items-center pt-1">
+                  <div className="flex items-center space-x-2 text-xs">
+                    <span className="text-ink-500 font-medium">Tone:</span>
                     <button
                       type="button"
                       onClick={() => setTone('editorial')}
-                      className={`text-xs px-2.5 py-1 rounded-lg font-medium transition ${tone === 'editorial' ? 'bg-ink-900 text-white' : 'bg-white text-ink-700 border border-sage-200'}`}
+                      className={`px-2.5 py-1 rounded-lg border text-[11px] font-semibold ${tone === 'editorial' ? 'bg-sage-800 text-white border-sage-800' : 'bg-white text-ink-700 border-sage-200'}`}
                     >
-                      Editorial & Luxury
+                      Editorial Luxury
                     </button>
                     <button
                       type="button"
                       onClick={() => setTone('direct')}
-                      className={`text-xs px-2.5 py-1 rounded-lg font-medium transition ${tone === 'direct' ? 'bg-ink-900 text-white' : 'bg-white text-ink-700 border border-sage-200'}`}
+                      className={`px-2.5 py-1 rounded-lg border text-[11px] font-semibold ${tone === 'direct' ? 'bg-sage-800 text-white border-sage-800' : 'bg-white text-ink-700 border-sage-200'}`}
                     >
-                      Direct & Conversion
+                      High-Conversion ROI
                     </button>
                   </div>
 
                   <button
                     type="submit"
                     disabled={isGenerating}
-                    className="bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow transition flex items-center space-x-1.5 disabled:opacity-50"
+                    className="bg-sage-800 hover:bg-sage-900 text-white text-xs font-semibold px-4 py-2 rounded-xl transition flex items-center space-x-1 disabled:opacity-50"
                   >
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>{isGenerating ? 'Synthesizing...' : 'Regenerate Pitch'}</span>
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    <span>{isGenerating ? 'Generating...' : 'Regenerate Pitch'}</span>
                   </button>
                 </div>
               </form>
 
-              {/* Pitch Output Card */}
-              <div className="bg-white border border-sage-200 rounded-2xl p-5 space-y-3 shadow-sm relative">
-                <div className="flex items-center justify-between border-b border-sage-100 pb-2">
-                  <span className="text-xs font-mono font-semibold text-ink-500">
-                    Subject: {generatedPitch.subject}
-                  </span>
-                  <button 
+              {/* Pitch Content Display */}
+              <div className="bg-white border border-sage-200 rounded-2xl p-5 space-y-3 shadow-xs">
+                <div className="flex justify-between items-center border-b border-sage-100 pb-2">
+                  <span className="text-xs font-bold text-ink-900">Subject: {generatedPitch.subject}</span>
+                  <button
                     onClick={handleCopy}
-                    className="inline-flex items-center space-x-1 text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 transition"
+                    className="text-xs font-semibold text-sage-800 hover:text-sage-900 flex items-center space-x-1"
                   >
                     {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copied ? 'Copied to Clipboard!' : 'Copy Pitch'}</span>
+                    <span>{copied ? 'Copied' : 'Copy Pitch'}</span>
                   </button>
                 </div>
 
-                <div className="text-xs text-ink-800 leading-relaxed font-sans whitespace-pre-wrap font-normal">
+                <div className="text-xs text-ink-700 leading-relaxed whitespace-pre-line font-normal">
                   {generatedPitch.body}
                 </div>
               </div>
-
             </div>
           ) : (
-            /* Digital Media Kit View */
-            <div className="bg-[#FAFBF9] rounded-2xl p-6 border border-sage-200 space-y-6">
-              
-              {/* Media Kit Header */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <img 
-                    src={creator?.avatar} 
-                    alt={creator?.name} 
-                    className="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow"
-                  />
-                  <div>
-                    <h4 className="text-xl font-editorial font-bold text-ink-900">{creator?.name}</h4>
-                    <p className="text-xs text-ink-500 font-medium">{creator?.handle} • {creator?.location}</p>
-                    <div className="inline-flex items-center space-x-1 text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full mt-1 border border-emerald-200">
-                      <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                      <span>Audited Authenticity Score: 98%</span>
+            /* Digital Media Kit Tab */
+            <div className="space-y-5 animate-fade-in">
+              <div className="bg-[#FAFBF9] border border-sage-200 rounded-3xl p-6 space-y-5">
+                
+                {/* Media Kit Header */}
+                <div className="flex items-center justify-between border-b border-sage-200 pb-4">
+                  <div className="flex items-center space-x-3">
+                    <img 
+                      src={creator?.avatar} 
+                      alt={creator?.name} 
+                      className="w-14 h-14 rounded-2xl object-cover border-2 border-sage-200"
+                    />
+                    <div>
+                      <h4 className="text-lg font-editorial font-bold text-ink-900">{creator?.name}</h4>
+                      <p className="text-xs text-ink-500">{creator?.role}</p>
                     </div>
+                  </div>
+                  <button
+                    onClick={handleDownloadMediaKit}
+                    className="bg-sage-800 hover:bg-sage-900 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-xs transition flex items-center space-x-1.5"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Export PDF</span>
+                  </button>
+                </div>
+
+                {/* 4 Core Pillars */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                  <div className="bg-white p-3 rounded-xl border border-sage-100">
+                    <div className="text-[10px] text-ink-400 font-bold uppercase">Reach</div>
+                    <div className="text-sm font-bold text-ink-900 mt-0.5">{creator?.socialStats?.instagram || '185K'}</div>
+                  </div>
+                  <div className="bg-white p-3 rounded-xl border border-sage-100">
+                    <div className="text-[10px] text-ink-400 font-bold uppercase">Engagement</div>
+                    <div className="text-sm font-bold text-emerald-700 mt-0.5">{creator?.socialStats?.engagementRate || '4.8%'}</div>
+                  </div>
+                  <div className="bg-white p-3 rounded-xl border border-sage-100">
+                    <div className="text-[10px] text-ink-400 font-bold uppercase">Authenticity</div>
+                    <div className="text-sm font-bold text-indigo-700 mt-0.5">{creator?.socialStats?.authenticityScore || 98}%</div>
+                  </div>
+                  <div className="bg-white p-3 rounded-xl border border-sage-100">
+                    <div className="text-[10px] text-ink-400 font-bold uppercase">Deals</div>
+                    <div className="text-sm font-bold text-amber-700 mt-0.5">{creator?.completedDeals || 42} Verified</div>
                   </div>
                 </div>
 
-                <div className="text-right">
-                  <span className="text-xs uppercase tracking-wider text-ink-400 font-semibold">Media Kit</span>
-                  <div className="text-sm font-editorial font-bold text-sage-800">2026 Season</div>
-                </div>
-              </div>
-
-              {/* Core Stats Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="bg-white p-3 rounded-xl border border-sage-200 text-center">
-                  <div className="text-[10px] text-ink-400 uppercase font-semibold">Total Audience</div>
-                  <div className="text-lg font-bold text-ink-900 mt-0.5">{creator?.socialStats?.instagram || "185K"}</div>
-                  <div className="text-[10px] text-emerald-600">Organic Reach</div>
-                </div>
-
-                <div className="bg-white p-3 rounded-xl border border-sage-200 text-center">
-                  <div className="text-[10px] text-ink-400 uppercase font-semibold">Engagement</div>
-                  <div className="text-lg font-bold text-ink-900 mt-0.5">{creator?.socialStats?.engagementRate || "4.8%"}</div>
-                  <div className="text-[10px] text-rose-500">2.1x Benchmark</div>
-                </div>
-
-                <div className="bg-white p-3 rounded-xl border border-sage-200 text-center">
-                  <div className="text-[10px] text-ink-400 uppercase font-semibold">Deals Finished</div>
-                  <div className="text-lg font-bold text-ink-900 mt-0.5">{creator?.completedDeals || 42}</div>
-                  <div className="text-[10px] text-sage-700">100% Escrow Verified</div>
-                </div>
-
-                <div className="bg-white p-3 rounded-xl border border-sage-200 text-center">
-                  <div className="text-[10px] text-ink-400 uppercase font-semibold">Client Rating</div>
-                  <div className="text-lg font-bold text-ink-900 mt-0.5">{creator?.rating || 4.96} ★</div>
-                  <div className="text-[10px] text-amber-600">Top 1% Tier</div>
-                </div>
-              </div>
-
-              {/* Standard Commercial Packages */}
-              <div className="space-y-2">
-                <div className="text-xs font-semibold uppercase tracking-wider text-ink-700">
-                  Standard Commercial Packages:
-                </div>
+                {/* Standard Packages in ₹ */}
                 <div className="space-y-2">
-                  <div className="bg-white p-3 rounded-xl border border-sage-200 flex justify-between items-center text-xs">
-                    <div>
-                      <div className="font-semibold text-ink-900">Single Editorial Flatlay Shoot</div>
-                      <div className="text-ink-500 text-[11px]">Includes 3 color-graded high-res stills for web/print</div>
+                  <h5 className="text-[11px] font-bold text-ink-700 uppercase tracking-wider">
+                    Standard Partnership Rates:
+                  </h5>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="bg-white p-3.5 rounded-xl border border-sage-200">
+                      <div className="font-bold text-xs text-ink-900">Single Flatlay</div>
+                      <div className="text-base font-editorial font-bold text-sage-900 mt-1">₹70,000</div>
+                      <div className="text-[10px] text-ink-400">3-day turnaround</div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-bold text-ink-900">$850</div>
-                      <div className="text-[10px] text-ink-400">3 Days Delivery</div>
+                    <div className="bg-white p-3.5 rounded-xl border border-sage-200">
+                      <div className="font-bold text-xs text-ink-900">Reel + 3 Stills</div>
+                      <div className="text-base font-editorial font-bold text-sage-900 mt-1">₹1,50,000</div>
+                      <div className="text-[10px] text-ink-400">7-day turnaround</div>
                     </div>
-                  </div>
-
-                  <div className="bg-white p-3 rounded-xl border border-sage-200 flex justify-between items-center text-xs">
-                    <div>
-                      <div className="font-semibold text-ink-900">Cinematic Reel + 3 High-Res Photos</div>
-                      <div className="text-ink-500 text-[11px]">Full production, scripting, sound design & usage rights</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold text-ink-900">$1,800</div>
-                      <div className="text-[10px] text-ink-400">7 Days Delivery</div>
+                    <div className="bg-white p-3.5 rounded-xl border border-sage-200">
+                      <div className="font-bold text-xs text-ink-900">Omni-Channel Suite</div>
+                      <div className="text-base font-editorial font-bold text-sage-900 mt-1">₹2,80,000</div>
+                      <div className="text-[10px] text-ink-400">14-day turnaround</div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Download Media Kit */}
-              <div className="pt-2 flex justify-end">
-                <button 
-                  onClick={() => alert("📥 Dynamic Media Kit Card exported! Ready for brand presentations.")}
-                  className="bg-sage-800 hover:bg-sage-900 text-white font-semibold text-xs px-4 py-2.5 rounded-xl shadow flex items-center space-x-1.5"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Export Media Kit Summary</span>
-                </button>
               </div>
-
             </div>
           )}
 

@@ -16,7 +16,7 @@ export default function CreateCampaignModal({ isOpen, onClose, onCampaignCreated
   const { user } = useAuth();
   const [title, setTitle] = useState('Autumn Silk & Fragrance Editorial Drop');
   const [productCategory, setProductCategory] = useState('Product & Editorial Photography');
-  const [budget, setBudget] = useState('$5,200');
+  const [budget, setBudget] = useState('₹3,50,000');
   const [deliverables, setDeliverables] = useState('2x 4K Cinematic Reels + 4x Editorial Product Stills');
   const [targetAge, setTargetAge] = useState('25-34');
   const [deadline, setDeadline] = useState('Dec 15, 2026');

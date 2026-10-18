@@ -14,6 +14,9 @@ import CreateCampaignModal from './components/CreateCampaignModal';
 import EditPortfolioModal from './components/EditPortfolioModal';
 import ProjectManagerModal from './components/ProjectManagerModal';
 import SocialSyncModal from './components/SocialSyncModal';
+import ProposalsPipeline from './components/ProposalsPipeline';
+import SubmitProposalModal from './components/SubmitProposalModal';
+import ContractViewerModal from './components/ContractViewerModal';
 import { LiveActivityMarquee } from './components/FloatingElements';
 
 // Initial fallback creators data matching backend
@@ -30,7 +33,7 @@ const initialCreators = [
     category: "Product & Editorial Photography",
     rating: 4.96,
     completedDeals: 42,
-    startingRate: "$1,800 / project",
+    startingRate: "₹1,50,000 / project",
     calculatedMatchScore: 94,
     tags: ["Photography", "Luxury Fashion", "Product Still Life", "Editorial"],
     socialStats: {
@@ -78,7 +81,7 @@ const initialCreators = [
     category: "Eco-Friendly Skincare & Beauty",
     rating: 4.98,
     completedDeals: 67,
-    startingRate: "$2,200 / campaign",
+    startingRate: "₹1,80,000 / campaign",
     calculatedMatchScore: 97,
     tags: ["Skincare", "Clean Beauty", "Sustainability", "Wellness"],
     socialStats: {
@@ -126,7 +129,7 @@ const initialCreators = [
     category: "Tech & Workspace Design",
     rating: 4.92,
     completedDeals: 38,
-    startingRate: "$1,950 / package",
+    startingRate: "₹1,60,000 / package",
     calculatedMatchScore: 88,
     tags: ["Tech", "Design", "Minimalism", "Desk Setup", "Productivity"],
     socialStats: {
@@ -171,7 +174,7 @@ const initialCampaigns = [
     brandLogo: "🌿",
     title: "Eco-Friendly Skincare Summer Launch",
     productCategory: "Skincare",
-    budget: "$4,500",
+    budget: "₹3,75,000",
     tags: ["Skincare", "Clean Beauty", "Sustainability", "Editorial"],
     deliverables: "1x High-Res Editorial Flatlay + 2x Cinematic IG Reels"
   },
@@ -181,7 +184,7 @@ const initialCampaigns = [
     brandLogo: "⚡",
     title: "Minimalist Magnetic Charger Showcase",
     productCategory: "Tech & Workspace Design",
-    budget: "$3,200",
+    budget: "₹2,65,000",
     tags: ["Tech", "Design", "Productivity", "Photography"],
     deliverables: "1x Desk Setup Feature Video + 3x Static Carousel Posts"
   }
@@ -216,6 +219,28 @@ function MainApp() {
   const [isEditPortfolioOpen, setIsEditPortfolioOpen] = useState(false);
   const [isProjectManagerOpen, setIsProjectManagerOpen] = useState(false);
   const [isSocialSyncOpen, setIsSocialSyncOpen] = useState(false);
+
+  // Day 5 Proposals state
+  const [proposals, setProposals] = useState([]);
+  const [isSubmitProposalOpen, setIsSubmitProposalOpen] = useState(false);
+  const [isContractViewerOpen, setIsContractViewerOpen] = useState(false);
+  const [selectedProposalForContract, setSelectedProposalForContract] = useState(null);
+
+  // Fetch proposals from backend
+  const fetchProposals = () => {
+    fetch('/api/proposals')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.proposals) {
+          setProposals(data.proposals);
+        }
+      })
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchProposals();
+  }, []);
 
   // Fetch live creators from backend — pass campaignId so scores recalculate dynamically
   const fetchCreators = (campaignId) => {
@@ -338,6 +363,7 @@ function MainApp() {
             onOpenSocialSync={() => setIsSocialSyncOpen(true)}
             onSelectTheme={handleSelectTheme}
             onDeleteProject={handleDeleteProject}
+            onOpenSubmitProposal={() => setIsSubmitProposalOpen(true)}
           />
         )}
 
@@ -356,6 +382,33 @@ function MainApp() {
             campaigns={campaigns}
             selectedCampaign={selectedCampaign}
             setSelectedCampaign={setSelectedCampaign}
+          />
+        )}
+
+        {activeView === 'proposals' && (
+          <ProposalsPipeline 
+            proposals={proposals}
+            currentRole={currentRole}
+            onUpdateStatus={async (id, status) => {
+              try {
+                const res = await fetch(`/api/proposals/${id}/status`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ status })
+                });
+                const data = await res.json();
+                if (data.success) {
+                  setProposals(prev => prev.map(p => p.id === id ? data.proposal : p));
+                }
+              } catch {
+                setProposals(prev => prev.map(p => p.id === id ? { ...p, status } : p));
+              }
+            }}
+            onViewContract={(proposal) => {
+              setSelectedProposalForContract(proposal);
+              setIsContractViewerOpen(true);
+            }}
+            onOpenSubmitProposal={() => setIsSubmitProposalOpen(true)}
           />
         )}
 
@@ -435,6 +488,44 @@ function MainApp() {
         onClose={() => setIsSocialSyncOpen(false)}
         creator={selectedCreator}
         onSyncSocial={handleSyncSocial}
+      />
+
+      {/* Day 5 Proposals & Contracts Modals */}
+      <SubmitProposalModal 
+        isOpen={isSubmitProposalOpen}
+        onClose={() => setIsSubmitProposalOpen(false)}
+        creator={selectedCreator}
+        campaigns={campaigns}
+        selectedCampaign={selectedCampaign}
+        onSubmitProposal={async (proposalPayload) => {
+          try {
+            const res = await fetch('/api/proposals', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(proposalPayload)
+            });
+            const data = await res.json();
+            if (data.success && data.proposal) {
+              setProposals(prev => [data.proposal, ...prev]);
+              return data;
+            }
+          } catch {
+            const localP = {
+              id: `prop-${Date.now()}`,
+              status: 'PENDING',
+              submittedAt: new Date().toISOString(),
+              ...proposalPayload
+            };
+            setProposals(prev => [localP, ...prev]);
+            return { success: true, proposal: localP };
+          }
+        }}
+      />
+
+      <ContractViewerModal 
+        isOpen={isContractViewerOpen}
+        onClose={() => setIsContractViewerOpen(false)}
+        proposal={selectedProposalForContract}
       />
 
     </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, 
   ShieldCheck, 
@@ -8,20 +8,72 @@ import {
   Eye, 
   AlertTriangle,
   Sparkles,
-  CheckCircle2 
+  CheckCircle2,
+  RefreshCw,
+  Layers
 } from 'lucide-react';
 
 export default function MediaVaultModal({ isOpen, onClose, creator }) {
   const [isWatermarkActive, setIsWatermarkActive] = useState(true);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const [watermarkDensity, setWatermarkDensity] = useState('diagonal'); // 'diagonal' | 'corner' | 'dense'
+  const canvasRef = useRef(null);
 
   if (!isOpen) return null;
 
   const sampleAsset = "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=1200&q=85";
+  const watermarkText = `CAMFLOW PROTECTED • DRAFT REVIEW ONLY • ${new Date().toLocaleDateString()}`;
+
+  // Draw dynamic canvas watermark overlay
+  useEffect(() => {
+    if (!isWatermarkActive) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = sampleAsset;
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+
+      // Watermark styling
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
+      ctx.lineWidth = 2;
+      ctx.font = 'bold 32px sans-serif';
+
+      if (watermarkDensity === 'diagonal') {
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate(-Math.PI / 4);
+        ctx.textAlign = 'center';
+        ctx.strokeText(watermarkText, 0, 0);
+        ctx.fillText(watermarkText, 0, 0);
+        ctx.strokeText(`CREATOR: ${creator?.name?.toUpperCase() || 'NELSON VANCE'}`, 0, 50);
+        ctx.fillText(`CREATOR: ${creator?.name?.toUpperCase() || 'NELSON VANCE'}`, 0, 50);
+        ctx.restore();
+      } else {
+        // Repeated grid pattern
+        for (let x = 80; x < canvas.width; x += 380) {
+          for (let y = 80; y < canvas.height; y += 220) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(-Math.PI / 6);
+            ctx.strokeText('CAMFLOW DRAFT', 0, 0);
+            ctx.fillText('CAMFLOW DRAFT', 0, 0);
+            ctx.restore();
+          }
+        }
+      }
+    };
+  }, [isWatermarkActive, watermarkDensity, creator]);
 
   const handleDownload = () => {
     if (isWatermarkActive) {
-      alert("⚠️ Raw download restricted: Milestone has not been approved yet. The raw unwatermarked asset unlocks automatically when the brand releases escrow funds.");
+      alert("⚠️ Raw download restricted: Milestone has not been approved yet. The unwatermarked 4K master file unlocks automatically when the brand releases escrow funds.");
       return;
     }
     setDownloadSuccess(true);
@@ -30,7 +82,7 @@ export default function MediaVaultModal({ isOpen, onClose, creator }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-3xl w-full border border-sage-200 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="bg-white rounded-3xl max-w-3xl w-full border border-sage-200 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         
         {/* Modal Header */}
         <div className="p-6 border-b border-sage-200 flex items-center justify-between bg-[#F8FAF7]">
@@ -41,10 +93,10 @@ export default function MediaVaultModal({ isOpen, onClose, creator }) {
             <div>
               <div className="flex items-center space-x-2">
                 <span className="text-xs uppercase tracking-wider font-semibold text-indigo-700">
-                  Killer Feature 3
+                  Content Watermarking & DRM
                 </span>
                 <span className="text-xs bg-indigo-50 border border-indigo-200 text-indigo-800 px-2 py-0.5 rounded-full font-bold">
-                  Dynamic Vault
+                  Dynamic Canvas Overlay
                 </span>
               </div>
               <h3 className="text-xl font-editorial font-semibold text-ink-900">
@@ -67,97 +119,124 @@ export default function MediaVaultModal({ isOpen, onClose, creator }) {
           {/* Explanation Box */}
           <div className="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-4 text-xs text-amber-900 flex items-start space-x-3">
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <div>
-              <strong>The Content Theft Problem:</strong> Creators routinely lose intellectual property when brands screenshot or download pre-payment drafts. CamFlow renders dynamic, tamper-evident HTML5 canvas watermarks during the review stage. Raw, uncompressed master files remain cryptographically locked until payment release.
+            <div className="leading-relaxed">
+              <strong>The Content Theft Problem:</strong> Creators routinely lose intellectual property when brands screenshot or download pre-payment review drafts. CamFlow dynamically draws dynamic, tamper-evident HTML5 canvas watermarks during review. Raw uncompressed masters unlock only upon escrow payout.
             </div>
           </div>
 
           {/* Interactive State Toggle */}
-          <div className="flex items-center justify-between bg-[#F5F8F4] p-3 rounded-2xl border border-sage-200">
-            <span className="text-xs font-semibold text-ink-800">
-              Current Vault State:
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-[#F5F8F4] p-3.5 rounded-2xl border border-sage-200 gap-3">
+            <span className="text-xs font-semibold text-ink-800 flex items-center gap-1.5">
+              <Layers className="w-4 h-4 text-sage-800" />
+              <span>Simulate Escrow Milestone State:</span>
             </span>
+
             <div className="flex items-center space-x-2">
-              <button 
+              <button
                 onClick={() => setIsWatermarkActive(true)}
-                className={`text-xs px-3 py-1.5 rounded-xl font-medium transition ${isWatermarkActive ? 'bg-amber-500 text-white font-semibold shadow-xs' : 'bg-white text-ink-700'}`}
+                className={`text-xs px-3 py-1.5 rounded-xl font-semibold transition flex items-center space-x-1.5 ${
+                  isWatermarkActive 
+                    ? 'bg-amber-500 text-white shadow-xs' 
+                    : 'bg-white text-ink-700 border border-sage-200 hover:bg-sage-50'
+                }`}
               >
-                🔒 Draft Review (Watermarked)
+                <Lock className="w-3.5 h-3.5" />
+                <span>Review Stage (Watermarked)</span>
               </button>
-              <button 
+
+              <button
                 onClick={() => setIsWatermarkActive(false)}
-                className={`text-xs px-3 py-1.5 rounded-xl font-medium transition ${!isWatermarkActive ? 'bg-emerald-600 text-white font-semibold shadow-xs' : 'bg-white text-ink-700'}`}
+                className={`text-xs px-3 py-1.5 rounded-xl font-semibold transition flex items-center space-x-1.5 ${
+                  !isWatermarkActive 
+                    ? 'bg-emerald-600 text-white shadow-xs' 
+                    : 'bg-white text-ink-700 border border-sage-200 hover:bg-sage-50'
+                }`}
               >
-                🔓 Escrow Paid (Raw Unlocked)
+                <Unlock className="w-3.5 h-3.5" />
+                <span>Approved (Raw Released)</span>
               </button>
             </div>
           </div>
 
-          {/* Dynamic Media Preview Container */}
-          <div className="relative rounded-2xl overflow-hidden border-2 border-dashed border-sage-300 bg-black/5 aspect-[16/10] flex items-center justify-center select-none">
-            <img 
-              src={sampleAsset} 
-              alt="Protected Creator Draft" 
-              className="w-full h-full object-cover"
-            />
-
-            {/* Dynamic Watermark Overlay */}
+          {/* Canvas Watermark Display */}
+          <div className="relative rounded-2xl overflow-hidden border-2 border-sage-200 bg-ink-900 max-h-[380px] flex items-center justify-center">
             {isWatermarkActive ? (
-              <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] flex flex-col items-center justify-center pointer-events-none p-6 text-center">
-                <div className="transform -rotate-12 space-y-4">
-                  <div className="bg-rose-600/90 text-white text-sm md:text-base font-extrabold uppercase tracking-widest px-6 py-2 rounded-xl shadow-2xl border border-white/40">
-                    PROTECTED DRAFT — AURA BOTANICALS REVIEW
-                  </div>
-                  <div className="text-xs font-mono text-white/90 drop-shadow-md">
-                    CAMFLOW SECURE VAULT • STAMP: {new Date().toLocaleDateString()} • NOT FOR COMMERCIAL BROADCAST
-                  </div>
-                </div>
-
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-[11px] text-white/90 bg-black/60 px-3 py-1.5 rounded-lg backdrop-blur-md">
-                  <span>Protected by CamFlow Client DRM</span>
-                  <span className="flex items-center text-amber-300 font-semibold">
-                    <Lock className="w-3 h-3 mr-1" />
-                    Raw Asset Locked
-                  </span>
-                </div>
-              </div>
+              <canvas 
+                ref={canvasRef} 
+                className="w-full h-auto max-h-[360px] object-contain"
+              />
             ) : (
-              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-white bg-emerald-900/80 px-4 py-2 rounded-xl backdrop-blur-md border border-emerald-400/40">
-                <div className="flex items-center space-x-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span className="font-semibold">Payment Released: Raw High-Resolution Master Unlocked</span>
-                </div>
-                <span className="text-[10px] bg-emerald-700 px-2 py-0.5 rounded-full font-bold">100% Commercial Rights</span>
-              </div>
+              <img 
+                src={sampleAsset} 
+                alt="Unwatermarked Master" 
+                className="w-full h-auto max-h-[360px] object-contain"
+              />
             )}
+
+            {/* Status Pill on Top */}
+            <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full border border-sage-200 text-xs font-bold text-ink-900 shadow-md flex items-center space-x-1.5">
+              {isWatermarkActive ? (
+                <>
+                  <Lock className="w-3.5 h-3.5 text-amber-600" />
+                  <span className="text-amber-800">DRM Watermark Active</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="text-emerald-800">4K Master Asset Unlocked</span>
+                </>
+              )}
+            </div>
           </div>
 
-          {/* Action Row */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+          {/* Watermark Pattern Options */}
+          {isWatermarkActive && (
+            <div className="flex items-center justify-between text-xs text-ink-600 px-1">
+              <span>Watermark Pattern:</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setWatermarkDensity('diagonal')}
+                  className={`px-2.5 py-1 rounded-lg border text-[11px] font-semibold ${watermarkDensity === 'diagonal' ? 'bg-sage-800 text-white border-sage-800' : 'bg-white text-ink-700 border-sage-200'}`}
+                >
+                  Diagonal Center
+                </button>
+                <button
+                  onClick={() => setWatermarkDensity('dense')}
+                  className={`px-2.5 py-1 rounded-lg border text-[11px] font-semibold ${watermarkDensity === 'dense' ? 'bg-sage-800 text-white border-sage-800' : 'bg-white text-ink-700 border-sage-200'}`}
+                >
+                  Grid Repeating
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Download & Security Details */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-sage-200">
             <div className="text-xs text-ink-500">
-              Format: 4K Pro-Res JPEG (12.4 MB) • Hash: <span className="font-mono text-ink-700">sha256:7f8a9...c32</span>
+              <span>Asset Resolution: <strong>3840 × 2160 (ProRes 422)</strong></span>
             </div>
 
             <div className="flex items-center space-x-3 w-full sm:w-auto">
+              {downloadSuccess && (
+                <span className="text-xs text-emerald-700 font-semibold flex items-center space-x-1">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Master downloaded!</span>
+                </span>
+              )}
+
               <button
                 onClick={handleDownload}
-                className={`flex-1 sm:flex-initial inline-flex items-center justify-center space-x-2 text-xs font-semibold px-5 py-2.5 rounded-xl shadow-sm transition ${
+                className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center space-x-2 transition shadow-sm ${
                   isWatermarkActive 
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                    ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed' 
                     : 'bg-emerald-600 hover:bg-emerald-700 text-white'
                 }`}
               >
                 <Download className="w-4 h-4" />
-                <span>{isWatermarkActive ? 'Download Locked' : 'Download Raw Master File'}</span>
+                <span>{isWatermarkActive ? 'Download Locked' : 'Download Raw Asset'}</span>
               </button>
             </div>
           </div>
-
-          {downloadSuccess && (
-            <div className="p-3 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-semibold text-center border border-emerald-200">
-              ✅ Raw 4K master asset downloaded with commercial license certificate.
-            </div>
-          )}
 
         </div>
 
