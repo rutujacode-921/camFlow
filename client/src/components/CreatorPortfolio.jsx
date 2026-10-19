@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import RotatingStamp from './RotatingStamp';
-import { FloatingPill1, FloatingPill2, FloatingEscrowChip } from './FloatingElements';
 import ThemeSelector, { EDITORIAL_THEMES } from './ThemeSelector';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -43,6 +42,8 @@ export default function CreatorPortfolio({
   const [inquiryMessage, setInquiryMessage] = useState('');
   const [submittedInquiry, setSubmittedInquiry] = useState(false);
 
+  const [studioMenuOpen, setStudioMenuOpen] = useState(false);
+
   if (!creator) return null;
 
   // Determine if viewing as creator owner
@@ -64,116 +65,8 @@ export default function CreatorPortfolio({
   return (
     <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-12">
       
-      {/* DAY 3: CREATOR STUDIO MANAGEMENT BAR (Visible when viewing own profile) */}
-      {isOwner && (
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-white border-2 border-sage-300 rounded-2xl p-3 px-5 shadow-sm animate-fadeIn">
-          <div className="flex items-center space-x-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-xs font-semibold uppercase tracking-wider text-ink-900">
-              ✨ Creator Studio Mode
-            </span>
-            <span className="hidden sm:inline text-xs text-ink-300">|</span>
-            <span className="hidden sm:inline text-xs text-sage-800 font-medium">
-              Live Customization Engine Active
-            </span>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <ThemeSelector 
-              currentTheme={currentThemeId} 
-              onSelectTheme={onSelectTheme} 
-            />
-
-            <button 
-              onClick={onOpenEditPortfolio}
-              className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-sage-50 hover:bg-sage-100 text-ink-900 px-3 py-1.5 rounded-full border border-sage-200 transition-colors shadow-xs"
-              title="Edit Profile, Bio, Rates & Tags"
-            >
-              <Edit3 className="w-3.5 h-3.5 text-sage-700" />
-              <span>Edit Profile</span>
-            </button>
-
-            <button 
-              onClick={onOpenProjectManager}
-              className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-sage-50 hover:bg-sage-100 text-ink-900 px-3 py-1.5 rounded-full border border-sage-200 transition-colors shadow-xs"
-              title="Add & Manage Showcase Projects"
-            >
-              <Plus className="w-3.5 h-3.5 text-sage-700" />
-              <span>Manage Projects</span>
-            </button>
-
-            <button 
-              onClick={onOpenSocialSync}
-              className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-900 px-3 py-1.5 rounded-full border border-emerald-200 transition-colors shadow-xs"
-              title="Sync Real-Time Metrics & Handles"
-            >
-              <RefreshCw className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Sync Socials</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Top Banner: Killer Feature Quick-Launch Badges */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-sage-200/80 rounded-2xl p-3 px-5 shadow-sm">
-        <div className="flex items-center space-x-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span className="text-xs font-semibold uppercase tracking-wider text-ink-700">Verified Creator Profile</span>
-          <span className="hidden sm:inline text-xs text-ink-300">|</span>
-          <span className="hidden sm:inline text-xs text-sage-800 font-medium">CamFlow Smart Escrow Enabled</span>
-        </div>
-        
-        {/* Killer Feature Direct Action Triggers */}
-        <div className="flex flex-wrap items-center gap-2">
-          <button 
-            onClick={() => onOpenMatchScoreModal(creator)}
-            className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-sage-100 hover:bg-sage-200 text-sage-900 px-3 py-1.5 rounded-full transition-colors border border-sage-300/60"
-            title="Inspect AI Match Score Algorithm"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-sage-700" />
-            <span>AI Match: {creator.calculatedMatchScore || 94}%</span>
-          </button>
-
-          <button 
-            onClick={() => onOpenScanner(creator)}
-            className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-full transition-colors border border-emerald-200"
-            title="Run Fake Follower & Audience Audit"
-          >
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Trust Badge: {creator.socialStats?.authenticityScore || 98}%</span>
-          </button>
-
-          <button 
-            onClick={() => onOpenEscrow(creator)}
-            className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-900 px-3 py-1.5 rounded-full transition-colors border border-amber-200"
-            title="View Escrow-Lite Milestone Pipeline"
-          >
-            <Lock className="w-3.5 h-3.5 text-amber-700" />
-            <span>Escrow Milestones</span>
-          </button>
-
-          <button 
-            onClick={() => onOpenMediaVault(creator)}
-            className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-900 px-3 py-1.5 rounded-full transition-colors border border-indigo-200"
-            title="Inspect Watermarked Content Vault"
-          >
-            <Eye className="w-3.5 h-3.5 text-indigo-600" />
-            <span>Watermark Vault</span>
-          </button>
-
-          <button 
-            onClick={() => onOpenPitchGenerator(creator)}
-            className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-900 px-3 py-1.5 rounded-full transition-colors border border-rose-200"
-            title="Generate AI Pitch & Media Kit"
-          >
-            <FileText className="w-3.5 h-3.5 text-rose-600" />
-            <span>AI Pitch Generator</span>
-          </button>
-        </div>
-      </div>
-
-      {/* SECTION 1: HERO SECTION (Exact 1:1 match to reference image with Theme accents) */}
-      <section className="relative pt-4 pb-8">
+      {/* SECTION 1: HERO SECTION */}
+      <section className="relative pt-6 pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Left Column: Heading, Bio, and Call to Action */}
@@ -185,7 +78,7 @@ export default function CreatorPortfolio({
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-editorial font-medium tracking-tight text-ink-900 leading-[1.12]">
-              Hello! I'm {creator.name.split(' ')[0]}, a {creator.category.toLowerCase().includes('photo') ? 'photographer' : 'visual creator'}
+              Hello! I'm {creator.name.split(' ')[0]}, a {creator.category.toLowerCase().includes('photo') ? 'photographer' : 'visual artist'}
             </h1>
 
             <p className="text-base sm:text-lg text-ink-700 leading-relaxed max-w-lg font-normal">
@@ -235,45 +128,82 @@ export default function CreatorPortfolio({
               </a>
 
               <button
-                onClick={() => onOpenPitchGenerator(creator)}
-                className="inline-flex items-center space-x-2 text-xs font-semibold bg-ink-900 text-white hover:bg-ink-800 px-4 py-2.5 rounded-full shadow-md transition-transform hover:-translate-y-0.5"
+                onClick={() => onOpenSubmitProposal && onOpenSubmitProposal()}
+                className="inline-flex items-center space-x-2 text-xs font-semibold bg-sage-800 hover:bg-sage-900 text-white px-5 py-2.5 rounded-full shadow-md transition-transform hover:-translate-y-0.5"
               >
-                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                <span>Instant Pitch & Media Kit</span>
+                <FileText className="w-3.5 h-3.5" />
+                <span>Work With Me</span>
               </button>
 
               <button
-                onClick={() => onOpenSubmitProposal && onOpenSubmitProposal()}
-                className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-sage-800 hover:bg-sage-900 text-white px-4 py-2.5 rounded-full shadow-md transition-transform hover:-translate-y-0.5"
+                onClick={() => onOpenPitchGenerator(creator)}
+                className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-white hover:bg-sage-50 text-ink-800 px-4 py-2.5 rounded-full border border-sage-200 transition-colors shadow-xs"
               >
-                <FileText className="w-3.5 h-3.5" />
-                <span>Submit Collaboration Proposal</span>
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>Media Kit</span>
               </button>
 
               {isOwner && (
-                <button
-                  onClick={onOpenEditPortfolio}
-                  className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-white hover:bg-sage-50 text-ink-800 px-3.5 py-2 rounded-full border border-sage-200 transition-colors shadow-xs"
-                >
-                  <Edit3 className="w-3.5 h-3.5 text-sage-700" />
-                  <span>Customize Portfolio</span>
-                </button>
+                <div className="relative">
+                  <button
+                    onClick={() => setStudioMenuOpen(!studioMenuOpen)}
+                    className="inline-flex items-center space-x-1.5 text-xs font-semibold bg-white hover:bg-sage-50 text-ink-800 px-3.5 py-2.5 rounded-full border border-sage-200 transition-colors shadow-xs"
+                  >
+                    <Sliders className="w-3.5 h-3.5 text-sage-700" />
+                    <span>Portfolio Settings</span>
+                  </button>
+
+                  {studioMenuOpen && (
+                    <div className="absolute left-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-sage-200 p-3 z-30 animate-fade-in space-y-2">
+                      <div className="text-[10px] uppercase font-bold text-ink-400 px-2 tracking-wider">
+                        Editorial Settings
+                      </div>
+                      
+                      <div className="p-2 bg-[#FAFBF9] rounded-xl border border-sage-100 space-y-1.5">
+                        <span className="text-[11px] font-semibold text-ink-700 block">Color Palette:</span>
+                        <ThemeSelector 
+                          currentTheme={currentThemeId} 
+                          onSelectTheme={onSelectTheme} 
+                        />
+                      </div>
+
+                      <button
+                        onClick={() => { setStudioMenuOpen(false); onOpenEditPortfolio(); }}
+                        className="w-full text-left flex items-center space-x-2 p-2 rounded-xl text-xs text-ink-800 hover:bg-sage-50 font-medium"
+                      >
+                        <Edit3 className="w-3.5 h-3.5 text-sage-700" />
+                        <span>Edit Profile & Rates</span>
+                      </button>
+
+                      <button
+                        onClick={() => { setStudioMenuOpen(false); onOpenProjectManager(); }}
+                        className="w-full text-left flex items-center space-x-2 p-2 rounded-xl text-xs text-ink-800 hover:bg-sage-50 font-medium"
+                      >
+                        <Plus className="w-3.5 h-3.5 text-sage-700" />
+                        <span>Manage Showcase Projects</span>
+                      </button>
+
+                      <button
+                        onClick={() => { setStudioMenuOpen(false); onOpenSocialSync(); }}
+                        className="w-full text-left flex items-center space-x-2 p-2 rounded-xl text-xs text-ink-800 hover:bg-sage-50 font-medium"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5 text-sage-700" />
+                        <span>Sync Social Channels</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>
 
-          {/* Right Column: Arched Hero Portrait with Rotating Stamp & Motion Pills */}
+          {/* Right Column: Arched Hero Portrait with Subtle Rotating Stamp */}
           <div className="lg:col-span-6 relative flex justify-center lg:justify-end items-center">
             
             {/* Rotating Stamp for Creator Profile */}
             <div className="absolute -left-4 sm:left-4 md:left-8 top-1/3 z-20">
-              <RotatingStamp text="MY PROFILE • MY PROFILE • " size={120} />
+              <RotatingStamp text="PORTFOLIO • VERIFIED • " size={110} />
             </div>
-
-            {/* Kinetic Floating Pills */}
-            <FloatingPill1 score={`${creator.socialStats?.authenticityScore || 98}%`} />
-            <FloatingPill2 stat="+42% ROI" label="Avg Conversion Lift" />
-            <FloatingEscrowChip />
 
             {/* The Arched Portrait Frame (Exact match to the reference image) */}
             <div className="relative w-[280px] sm:w-[340px] md:w-[380px] h-[390px] sm:h-[460px] md:h-[500px] overflow-hidden arch-portrait shadow-2xl bg-sage-100 border-[6px] border-white transition-all duration-500 hover:scale-[1.01]">
@@ -282,7 +212,6 @@ export default function CreatorPortfolio({
                 alt={creator.name}
                 className="w-full h-full object-cover object-center filter saturate-[1.02] contrast-[1.02]"
               />
-              {/* Soft editorial gradient tint at base */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none"></div>
             </div>
 

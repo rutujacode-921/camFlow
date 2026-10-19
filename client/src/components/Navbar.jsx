@@ -34,37 +34,34 @@ export default function Navbar({
               <span className="text-xl font-editorial font-bold tracking-tight text-ink-900">
                 CamFlow
               </span>
-              <span className="block text-[10px] uppercase tracking-widest font-semibold text-sage-800 -mt-1">
-                Ecosystem
-              </span>
             </div>
           </div>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center space-x-7 text-sm font-medium">
+          <nav className="hidden md:flex items-center space-x-8 text-sm font-medium">
             <button 
               onClick={() => setActiveView('portfolio')}
               className={`transition-colors py-1 ${activeView === 'portfolio' ? 'text-ink-900 font-semibold border-b-2 border-sage-800' : 'text-ink-500 hover:text-ink-900'}`}
             >
-              Creator Portfolio
+              Portfolio
             </button>
             <button 
               onClick={() => setActiveView('directory')}
               className={`transition-colors py-1 ${activeView === 'directory' ? 'text-ink-900 font-semibold border-b-2 border-sage-800' : 'text-ink-500 hover:text-ink-900'}`}
             >
-              Brand Discovery & AI Match
+              Discover Brands
             </button>
             <button 
               onClick={() => setActiveView('proposals')}
               className={`transition-colors py-1 ${activeView === 'proposals' ? 'text-ink-900 font-semibold border-b-2 border-sage-800' : 'text-ink-500 hover:text-ink-900'}`}
             >
-              Proposals & Pipeline
+              Campaigns
             </button>
             <button 
               onClick={() => setActiveView('escrow')}
               className={`transition-colors py-1 ${activeView === 'escrow' ? 'text-ink-900 font-semibold border-b-2 border-sage-800' : 'text-ink-500 hover:text-ink-900'}`}
             >
-              Escrow Milestone Tracker
+              Payments
             </button>
           </nav>
 

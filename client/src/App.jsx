@@ -17,7 +17,6 @@ import SocialSyncModal from './components/SocialSyncModal';
 import ProposalsPipeline from './components/ProposalsPipeline';
 import SubmitProposalModal from './components/SubmitProposalModal';
 import ContractViewerModal from './components/ContractViewerModal';
-import { LiveActivityMarquee } from './components/FloatingElements';
 
 // Initial fallback creators data matching backend
 const initialCreators = [
@@ -336,9 +335,6 @@ function MainApp() {
   return (
     <div className="min-h-screen bg-[#FAFAF8] text-[#181A1B] flex flex-col selection:bg-sage-200">
       
-      {/* Dynamic Marquee Header Ticker */}
-      <LiveActivityMarquee />
-
       {/* Main Navbar with Auth & Onboarding Triggers */}
       <Navbar 
         activeView={activeView}
